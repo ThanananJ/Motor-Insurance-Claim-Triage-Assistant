@@ -1,0 +1,42 @@
+[
+  {
+    "case_id": 1,
+    "name": "Standard covered event with missing third-party information",
+    "scenario": "Parked vehicle was hit by another car at a shopping mall",
+    "documents_submitted": ["Claim form", "Vehicle registration", "Photos of damage"],
+    "claim_history": "1 claim in past 24 months",
+    "expected_routing": ["Manual review"]
+  },
+  {
+    "case_id": 2,
+    "name": "Clear exclusion",
+    "scenario": "Customer crashed while participating in an illegal street race",
+    "documents_submitted": ["Claim form", "Photos of damage", "Police report"],
+    "claim_history": "No prior claim",
+    "expected_routing": ["Rejection review"]
+  },
+  {
+    "case_id": 3,
+    "name": "Theft claim with missing police report",
+    "scenario": "Vehicle stolen from condominium parking",
+    "documents_submitted": ["Claim form", "Vehicle registration"],
+    "claim_history": "No prior claim",
+    "expected_routing": ["Manual review"]
+  },
+  {
+    "case_id": 4,
+    "name": "Potential fraud risk",
+    "scenario": "Severe front-end damage with only one unclear photo",
+    "documents_submitted": ["One unclear photo"],
+    "claim_history": "4 claims in past 12 months",
+    "expected_routing": ["Fraud review"]
+  },
+  {
+    "case_id": 5,
+    "name": "Late submission",
+    "scenario": "Flood damage happened 45 days before submission; no reason for late submission was provided",
+    "documents_submitted": ["Claim form", "Vehicle registration", "Photos of damage"],
+    "claim_history": null,
+    "expected_routing": ["Rejection review", "Manual review"]
+  }
+]

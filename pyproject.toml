@@ -1,0 +1,19 @@
+[project]
+name = "motor-insurance-claim-triage-assistant"
+version = "0.1.0"
+description = "Hybrid AI-assisted motor insurance claim triage prototype"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "gradio",
+    "langchain-ollama",
+    "pydantic>=2,<3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

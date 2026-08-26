@@ -1,0 +1,2 @@
+# Compatibility notice: pyproject.toml is the single dependency source of truth.
+# Use uv to create the environment, resolve dependencies, and run the project.
