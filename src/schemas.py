@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -125,6 +125,84 @@ class LLMExtractionPayload(BaseModel):
     )
 
 
+class EventExclusionExtraction(BaseModel):
+    """Focused LLM payload for event and explicit exclusion semantics."""
+
+    event_type: EventType
+    alcohol_or_drug_involvement: FactStatus
+    illegal_racing: FactStatus
+    intentional_damage: FactStatus
+    outside_permitted_geographic_coverage: FactStatus
+
+
+class HistoryRiskExtraction(BaseModel):
+    """Focused LLM payload for claim-history and semantic risk signals."""
+
+    suspicious_pattern: FactStatus
+    inconsistent_story: FactStatus
+    repeated_claims: FactStatus
+    severe_damage: FactStatus
+    weak_evidence: FactStatus
+
+
+class LateReasonExtraction(BaseModel):
+    """Focused LLM payload for the stated presence or absence of a late reason."""
+
+    late_submission_valid_reason: FactStatus
+
+
+class FocusedGroupResult(BaseModel):
+    """Observable execution status for one validated focused extraction call."""
+
+    group: str
+    success: bool
+    retry_count: int = Field(default=0, ge=0, le=1)
+    latency_seconds: float = Field(ge=0)
+    error: str | None = None
+    error_code: str | None = None
+
+
+class FocusedSemanticExtractionResult(BaseModel):
+    """Composed canonical facts plus per-group validation/fallback status."""
+
+    success: bool
+    facts: ClaimFacts
+    groups: list[FocusedGroupResult]
+    failed_groups: list[str] = Field(default_factory=list)
+    provider: str | None = None
+    model: str | None = None
+
+
+class SemanticFactProposal(BaseModel):
+    """Untrusted semantic suggestions that must never enter P0 directly."""
+
+    facts: ClaimFacts = Field(default_factory=ClaimFacts)
+    source: Literal["llm", "safe_fallback"]
+    confirmed: Literal[False] = False
+    extraction_success: bool
+    provider: str | None = None
+    model: str | None = None
+    failed_groups: list[str] = Field(default_factory=list)
+    warning: str = "LLM suggestions are advisory and require human confirmation."
+
+
+class HumanReviewPayload(BaseModel):
+    """Stage-one result presented for mandatory officer review/correction."""
+
+    claim: ClaimInput
+    proposal: SemanticFactProposal
+    confirmation_required: Literal[True] = True
+
+
+class ConfirmedClaimFacts(BaseModel):
+    """Only this explicit human-confirmation contract may cross into P0."""
+
+    claim_id: str
+    facts: ClaimFacts
+    confirmed_by_human: Literal[True]
+    officer_note: str | None = None
+
+
 class EvidenceSource(str, Enum):
     CLAIM_DESCRIPTION = "claim_description"
     CUSTOMER_CLAIM_HISTORY = "customer_claim_history"
@@ -233,3 +311,24 @@ class TriageResult(BaseModel):
     recommended_routing: Routing
     reasoning: str
     confidence_level: ConfidenceLevel
+
+
+class ConfirmedTriageResult(BaseModel):
+    """Presentation-ready backend result derived from confirmed facts and P0."""
+
+    claim_id: str
+    proposed_facts: ClaimFacts
+    confirmed_facts: ClaimFacts
+    initial_coverage_assessment: CoverageAssessment
+    missing_documents: list[str]
+    missing_information: list[str]
+    risk_flags: list[str]
+    recommended_routing: Routing
+    deterministic_reasoning_points: list[str]
+    claim_summary: str
+    explanation: str
+    human_confirmation_status: Literal["confirmed"] = "confirmed"
+    recommendation_disclaimer: str = (
+        "This is a triage recommendation, not a final claim decision. "
+        "The Human Claim Officer remains the final decision maker."
+    )

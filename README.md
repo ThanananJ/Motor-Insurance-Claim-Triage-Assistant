@@ -1,53 +1,170 @@
 # Motor Insurance Claim Triage Assistant
 
-Prototype decision-support system for initial motor-insurance claim triage.
-The assistant will summarize claims, ground assessments in the provided policy,
-identify missing information and risk signals, and recommend a routing path.
+## Overview
 
-The Claim Officer remains responsible for every final claim decision.
+A local Hybrid AI prototype that helps a Motor Insurance Claim Officer perform
+initial claim triage. The Local LLM proposes semantic facts; the officer must
+review and correct them before deterministic Policy engines calculate coverage,
+missing documents, risk signals, and a routing recommendation.
 
-## Current status
+The Claim Officer remains the final decision maker. The application cannot
+approve/reject a claim, confirm fraud, or authorize payment.
 
-P0 deterministic claim analysis is implemented and covered by unit tests. It
-accepts validated structured facts, checks Policy-required documents, evaluates
-covered events and explicit exclusions, handles validated risk signals, and
-returns a controlled routing recommendation.
+## Business Problems
 
-Local LLM provider integration, exact Policy prompt grounding, structured
-semantic extraction, validation, and safe fallback are implemented. A local
-model must be selected and configured before live inference can run. Generated
-summary/explanation composition and Gradio UI behavior are not yet implemented.
+- Check whether submitted claim documents satisfy Policy requirements.
+- Apply coverage and exclusion conditions consistently, including exact date
+  calculation.
+- Surface suspicious/inconsistent evidence and Policy risk indicators without
+  turning them into an autonomous fraud conclusion.
 
-Run deterministic tests with:
+The MVP checks document presence. OCR and document-authenticity/image-forensic
+analysis are future work.
+
+## Solution Architecture
+
+```text
+Gradio Claim Input
+    ↓
+Ollama Local LLM + Exact Policy Context
+    ↓
+Pydantic-validated Semantic Fact Proposal
+    ↓
+Mandatory Claim Officer Review / Correction
+    ↓
+ConfirmedClaimFacts
+    ↓
+Deterministic Document / Coverage / Date / Risk / Routing Engines
+    ↓
+Structured Recommendation
+    ↓
+Human Claim Officer Final Decision
+```
+
+The configured Local LLM is advisory and untrusted. Gradio uses the two-stage
+`TriageService`; unconfirmed model facts cannot enter the deterministic core.
+
+## Tech Stack
+
+- Python 3.11+
+- Gradio frontend
+- Ollama + Local LLM runtime
+- `langchain-ollama` provider integration
+- Pydantic structured validation
+- Exact Policy Context grounding
+- Python deterministic Rule/Risk engines
+- `uv` dependency and project management
+- pytest testing
+
+Cloud LLM providers and production RAG/vector search are optional future work,
+not implemented prototype dependencies.
+
+## Project Structure
+
+```text
+app.py                  Gradio entry point
+data/                   immutable Policy and Assignment cases
+docs/                   solution design, limitations, demo runbook
+prompts/                prompt design and extraction templates
+results/                historical and final validation results
+scripts/                controlled local-model evaluation harnesses
+src/
+  llm/                  provider integration
+  policy/               exact Policy loading/retrieval
+  rules/                deterministic engines
+  services/             extraction and confirmed orchestration
+  orchestrator.py       P0 deterministic composition
+  schemas.py            Pydantic contracts
+tests/                  automated tests
+```
+
+`CODEX_HANDOFF.md` and `CODEX_PROTOTYPE_INSTRUCTIONS_with_policy.md` are
+git-ignored development-coordination files and are not submission artifacts.
+Local `.env`, virtual environments, caches, and Ollama model binaries are not
+tracked.
+
+## Setup
+
+From the repository root:
 
 ```powershell
 uv sync
+```
+
+`pyproject.toml` and `uv.lock` are the dependency source of truth.
+`requirements.txt` is a compatibility notice only.
+
+## Ollama Configuration
+
+Ollama is optional for generating AI suggestions; the safe manual workflow
+still works if inference is unavailable. To use local inference, start the
+existing Ollama service and ensure the configured model is already installed:
+
+```powershell
+ollama --version
+ollama list
+ollama ps
+```
+
+Copy `.env.example` to a local `.env` and configure:
+
+```text
+LLM_PROVIDER
+OLLAMA_BASE_URL
+OLLAMA_MODEL
+OLLAMA_TIMEOUT_SECONDS
+```
+
+Do not commit `.env`. The tested presentation environment used `qwen2.5:3b` as
+an advisory model; it is not accepted as an autonomous extractor.
+
+## Run Prototype
+
+```powershell
+uv run python app.py
+```
+
+Open the localhost Gradio URL printed in the terminal. No public share link is
+created. If Ollama fails, all AI facts safely fall back to UNKNOWN so the Claim
+Officer can enter/correct them, confirm, and continue with deterministic triage.
+
+## Run Tests
+
+```powershell
 uv run pytest -q
 ```
 
-## Planned stack
+Final validated baseline: **115 passed, 0 failed, 0 warnings**.
 
-- Python 3.11+
-- Gradio frontend with chatbot and structured claim panels
-- Ollama + Local LLM as the primary MVP runtime
-- `langchain-ollama` as the planned Ollama communication layer
-- Pydantic structured validation
-- `uv` project, environment, and dependency management
-- pytest for deterministic tests
-- Gemini or another cloud LLM as an optional/future provider
+## Demo Flow
 
-## Implementation status
+1. Load an Assignment Case or enter a claim.
+2. Analyze Claim with AI.
+3. Review and correct every proposed fact.
+4. Check the mandatory Human Confirmation box.
+5. Run deterministic triage.
+6. Inspect coverage, documents, risk signals, routing, and reasoning.
+7. The Claim Officer makes the final decision.
 
-- **Implemented:** Pydantic contracts, tested P0 deterministic core, Ollama
-  provider adapter, exact-Policy semantic extraction, and safe failure results.
-- **Planned:** Grounded result composition/explanation and Gradio UI.
+See `docs/demo-runbook.md` for the short presentation flow.
 
-Live semantic extraction requires an existing Ollama service and an explicitly
-configured `OLLAMA_MODEL`. The application never downloads or silently selects
-a model. `OLLAMA_BASE_URL` and `OLLAMA_TIMEOUT_SECONDS` are also configurable.
+## Assignment Cases
 
-`pyproject.toml` is the dependency source of truth. `requirements.txt` remains
-only as a compatibility notice so dependency definitions are not duplicated.
+| Case | Final prototype routing |
+|---|---|
+| 1 | Manual review |
+| 2 | Rejection review |
+| 3 | Manual review |
+| 4 | Fraud review |
+| 5 | Manual review |
 
-See `docs/solution-design.md` for the solution architecture and
-`docs/limitations-and-roadmap.md` for scope boundaries and roadmap.
+Human Confirmation may be required to correct imperfect Local LLM proposals;
+the expected route is never injected into runtime logic.
+
+## Documentation
+
+- `docs/solution-design.md` — implemented architecture and assignment mapping
+- `prompts/prompt-design.md` — prompt and structured-output boundaries
+- `results/test-results.md` — historical experiments and final evidence
+- `docs/limitations-and-roadmap.md` — prototype limitations and future work
+- `docs/demo-runbook.md` — presenter instructions

@@ -75,9 +75,57 @@ Malformed/schema-invalid output receives at most one corrective retry asking
 only for all required fields and allowed enum values. Semantic disagreement
 with an expected test answer never triggers a retry.
 
+Schema validation proves structure, not semantic truth. Every validated output
+therefore remains an unconfirmed `SemanticFactProposal`. The implemented trust
+boundary is:
+
+```text
+LLM output → Pydantic proposal validation → Mandatory Human Confirmation
+→ ConfirmedClaimFacts → P0 deterministic core → Human final decision
+```
+
+The officer may replace any proposed value. The original proposal cannot
+override confirmed facts and cannot select routing.
+
 ## Safe failure behavior
 
 When Ollama or the configured model is unavailable, inference times out, or
 structured validation fails, the application does not repair or invent facts.
-It exposes extraction as unavailable/incomplete so later orchestration can run
-reliable deterministic checks and preserve Manual/Human Review.
+It returns a safe UNKNOWN proposal; the officer can enter/correct facts,
+confirm them, and continue through deterministic triage.
+
+## Focused extraction evaluation
+
+P1.7 evaluates three focused calls instead of one broad semantic call:
+
+- Event/exclusion receives only the claim narrative.
+- History/risk receives the narrative, customer claim history, and submitted
+  evidence metadata.
+- Late reason receives only the narrative and never receives dates.
+
+Each prompt retains the five-part boundary, exact full Policy context,
+TRUE/FALSE/UNKNOWN semantics, a narrow Pydantic schema, and at most one
+structural retry. Exact full Policy remains in each call for simple source
+traceability; irrelevant claim fields are removed instead of paraphrasing the
+Policy into new authoritative rules.
+
+The schemas own disjoint canonical fields. Valid outputs are composed
+deterministically into one `ClaimFacts`. A failed group contributes UNKNOWN
+only for its fields and is reported in group status; successful groups remain
+usable. Composition does not interpret text, repair semantics, or select a
+favorable value. P0 and the human decision boundary are unchanged.
+
+## P1.8 controlled context experiment
+
+P1.8 varied only two dimensions while retaining identical focused schemas,
+claim inputs, tri-state semantics, structural retry, Pydantic validation,
+composition, and P0: A full Policy+detailed instructions; B full
+Policy+minimal instructions; C exact relevant Policy+detailed instructions;
+and D exact relevant Policy+minimal instructions. Relevant context is copied
+verbatim from `data/policy_rules.md`, not paraphrased into a new rule. The
+matrix remains evaluation-only because no configuration passed acceptance.
+
+P1.9 reused configuration C unchanged for qwen3:4b. Thinking was disabled via
+a process-local provider option after the unmodified thinking-mode claim took
+231.8 seconds; prompt, Policy, schema, and semantics were unchanged. This
+baseline remains evaluation-only because mandatory safety/routing gates failed.
