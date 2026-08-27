@@ -83,6 +83,13 @@ git-ignored development-coordination files and are not submission artifacts.
 Local `.env`, virtual environments, caches, and Ollama model binaries are not
 tracked.
 
+## Prerequisites
+
+- Python 3.11+ with the project environment managed through `uv`.
+- Ollama is optional and is used only for advisory semantic suggestions.
+  Deterministic triage remains usable through UNKNOWN/manual correction when
+  Ollama is unavailable.
+
 ## Setup
 
 From the repository root:
@@ -124,9 +131,11 @@ an advisory model; it is not accepted as an autonomous extractor.
 uv run python app.py
 ```
 
-Open the localhost Gradio URL printed in the terminal. No public share link is
-created. If Ollama fails, all AI facts safely fall back to UNKNOWN so the Claim
-Officer can enter/correct them, confirm, and continue with deterministic triage.
+Open the localhost Gradio URL printed in the terminal. The common verified URL
+is `http://127.0.0.1:7860`, but Gradio may select another free local port. No
+public share link is required. If Ollama fails, all AI facts safely fall back
+to UNKNOWN so the Claim Officer can enter/correct them, confirm, and continue
+with deterministic triage.
 
 ## Run Tests
 
@@ -136,17 +145,29 @@ uv run pytest -q
 
 Final validated baseline: **115 passed, 0 failed, 0 warnings**.
 
-## Demo Flow
+## Try the Prototype
 
-1. Load an Assignment Case or enter a claim.
-2. Analyze Claim with AI.
-3. Review and correct every proposed fact.
-4. Check the mandatory Human Confirmation box.
-5. Run deterministic triage.
-6. Inspect coverage, documents, risk signals, routing, and reasoning.
-7. The Claim Officer makes the final decision.
+1. Run `uv run python app.py` and open the printed localhost URL.
+2. Select Assignment Case 1–5 or enter a custom claim.
+3. Click **Analyze Claim with AI**.
+4. Review and correct Event Type, exclusion/risk facts, and
+   TRUE/FALSE/UNKNOWN values.
+5. Check the mandatory **Human Confirmation** box.
+6. Click **Confirm Facts & Run Triage**.
+7. Review coverage, missing documents, risk signals, recommended routing,
+   deterministic reasoning, summary, and explanation.
+8. The Claim Officer makes the final decision.
 
 See `docs/demo-runbook.md` for the short presentation flow.
+
+## Recommended Demo
+
+Use Assignment Case 4 and confirm/correct `repeated_claims`, `severe_damage`,
+and `weak_evidence` to TRUE when supported. The expected recommendation is
+**Fraud review**. This is a review route—not an AI fraud conclusion—and the
+Claim Officer retains the final decision. Case 5 is the optional uncertainty
+example and should remain **Manual review** after unsupported facts are
+corrected or preserved as UNKNOWN.
 
 ## Assignment Cases
 
