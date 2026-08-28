@@ -96,7 +96,7 @@ def load_demo_case(selection: str):
 def reset_review_ui():
     """Invalidate advisory and result state whenever claim inputs change."""
 
-    empty_result = ("", "No result yet.", "No result yet.", "", "No result yet.", "", "")
+    empty_result = ("", "No result yet.", "No result yet.", "", "No result yet.", "No result yet.", "", "")
     final_notice = (
         "**Final Decision: Pending Human Claim Officer Review.** "
         "This is an AI-assisted triage recommendation, not a final claim decision."
@@ -115,7 +115,7 @@ def clear_result_ui():
     """Clear a previous deterministic result before a new AI analysis."""
 
     return (
-        "", "No result yet.", "No result yet.", "", "No result yet.", "", "",
+        "", "No result yet.", "No result yet.", "", "No result yet.", "No result yet.", "", "",
         "**Final Decision: Pending Human Claim Officer Review.** "
         "This is an AI-assisted triage recommendation, not a final claim decision.",
     )
@@ -141,7 +141,7 @@ def analyze_claim_ui(*values):
 
 
 def confirm_with_service(service: TriageService, review, confirmation_checked: bool, *fact_values: str):
-    blank = ("", "", "", "", "", "", "")
+    blank = ("", "", "", "", "", "", "", "")
     if not confirmation_checked:
         return (*blank, "Please review and confirm/correct the AI suggested facts before running triage.")
     if review is None:
@@ -151,12 +151,13 @@ def confirm_with_service(service: TriageService, review, confirmation_checked: b
         review,
         ConfirmedClaimFacts(claim_id=review.claim.claim_id, facts=facts, confirmed_by_human=True),
     )
-    missing = "\n".join(f"- {item}" for item in result.missing_documents) or "No missing required documents"
+    missing = "\n".join(f"- {item}" for item in result.missing_information) or "No missing or unresolved information"
     risks = "\n".join(f"- {item}" for item in result.risk_flags) or "No validated risk signals"
     reasoning = "\n".join(f"- {item}" for item in result.deterministic_reasoning_points)
     return (
         result.initial_coverage_assessment.value, missing, risks,
-        result.recommended_routing.value, reasoning, result.claim_summary,
+        result.recommended_routing.value, result.confidence_level.value,
+        reasoning, result.claim_summary,
         result.explanation,
         "Final Decision: Pending Human Claim Officer Review. " + result.recommendation_disclaimer,
     )
@@ -166,7 +167,7 @@ def confirm_claim_ui(*values):
     try:
         return confirm_with_service(TRIAGE_SERVICE, *values)
     except Exception:
-        return ("", "", "", "", "", "", "", "Unable to run triage. Re-analyze this claim, review the facts, and try again.")
+        return ("", "", "", "", "", "", "", "", "Unable to run triage. Re-analyze this claim, review the facts, and try again.")
 
 
 def build_demo() -> gr.Blocks:
@@ -214,9 +215,10 @@ def build_demo() -> gr.Blocks:
 
         gr.Markdown("## Step 3 — Triage Recommendation")
         with gr.Row():
-            coverage = gr.Textbox(label="Coverage Assessment", interactive=False)
+            coverage = gr.Textbox(label="Initial Coverage Assessment", interactive=False)
             routing = gr.Textbox(label="Recommended Routing", interactive=False)
-        gr.Markdown("### Missing Documents")
+            confidence = gr.Textbox(label="Prototype Confidence Level", interactive=False)
+        gr.Markdown("### Missing Information")
         missing = gr.Markdown("No result yet.")
         gr.Markdown("### Risk Signals")
         risks = gr.Markdown("No result yet.")
@@ -229,7 +231,7 @@ def build_demo() -> gr.Blocks:
         claim_components = [claim_id, customer, vehicle, description, history, incident, submitted, documents]
         review_outputs = [
             review_state, proposal_status, event_type, *fact_components, confirmation,
-            coverage, missing, risks, routing, reasoning, summary, explanation, final_notice,
+            coverage, missing, risks, routing, confidence, reasoning, summary, explanation, final_notice,
         ]
         demo_case.change(load_demo_case, demo_case, claim_components).then(
             reset_review_ui, outputs=review_outputs,
@@ -238,13 +240,13 @@ def build_demo() -> gr.Blocks:
             component.input(reset_review_ui, outputs=review_outputs)
         analyze_button.click(
             clear_result_ui,
-            outputs=[coverage, missing, risks, routing, reasoning, summary, explanation, final_notice],
+            outputs=[coverage, missing, risks, routing, confidence, reasoning, summary, explanation, final_notice],
         ).then(
             analyze_claim_ui,
             claim_components,
             [review_state, proposal_status, event_type, *fact_components, confirmation],
         )
-        confirm_button.click(confirm_claim_ui, [review_state, confirmation, event_type, *fact_components], [coverage, missing, risks, routing, reasoning, summary, explanation, final_notice])
+        confirm_button.click(confirm_claim_ui, [review_state, confirmation, event_type, *fact_components], [coverage, missing, risks, routing, confidence, reasoning, summary, explanation, final_notice])
     return demo
 
 

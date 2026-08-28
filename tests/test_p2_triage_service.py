@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 from pydantic import ValidationError
 
-from src.schemas import ClaimFacts, ConfirmedClaimFacts, Routing
+from src.schemas import ClaimFacts, ConfidenceLevel, ConfirmedClaimFacts, Routing
 from src.services.triage_service import TriageService
 
 
@@ -61,6 +61,20 @@ def test_prepare_returns_unconfirmed_advisory_proposal(claim_factory):
     assert review.proposal.facts.repeated_claims.value == "true"
 
 
+def test_explicit_assignment_context_aligns_advisory_facts_but_still_requires_confirmation(claim_factory):
+    service = TriageService(StubExtractor())
+    third_party = service.prepare_claim(
+        claim_factory(claim_description="Parked vehicle was hit by another car at a shopping mall")
+    )
+    repeated = service.prepare_claim(
+        claim_factory(customer_claim_history="4 claims in past 12 months")
+    )
+    assert third_party.proposal.facts.event_type.value == "third_party_property_damage"
+    assert repeated.proposal.facts.repeated_claims.value == "true"
+    assert third_party.proposal.confirmed is False
+    assert repeated.confirmation_required is True
+
+
 def test_unconfirmed_facts_are_rejected_before_p0(claim_factory):
     review = TriageService(StubExtractor()).prepare_claim(claim_factory(claim_id="P2-NO"))
     with pytest.raises(ValidationError):
@@ -103,6 +117,18 @@ def test_explanation_cannot_mutate_deterministic_routing(claim_factory):
     service = TriageService(StubExtractor(), MutatingExplanation())
     result = service.confirm_and_analyze(service.prepare_claim(claim), confirmed(claim.claim_id))
     assert result.recommended_routing is Routing.MANUAL_REVIEW
+
+
+def test_confidence_is_rule_based_enum_not_percentage(claim_factory):
+    claim = claim_factory(claim_id="P2-CONFIDENCE")
+    service = TriageService(StubExtractor())
+    result = service.confirm_and_analyze(
+        service.prepare_claim(claim),
+        confirmed(claim.claim_id),
+    )
+    assert result.confidence_level in set(ConfidenceLevel)
+    assert result.confidence_level.value in {"High", "Medium", "Low"}
+    assert "%" not in result.confidence_level.value
 
 
 @pytest.mark.parametrize(

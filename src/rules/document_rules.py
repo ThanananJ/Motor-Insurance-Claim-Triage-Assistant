@@ -71,11 +71,12 @@ def normalize_document_name(document_name: str) -> str:
 
 
 def required_documents(event_type: EventType) -> list[DocumentRequirement]:
-    requirements = list(BASE_REQUIREMENTS)
+    requirements: list[DocumentRequirement] = []
     if event_type is EventType.THEFT:
         requirements.extend(THEFT_REQUIREMENTS)
     elif event_type is EventType.THIRD_PARTY_PROPERTY_DAMAGE:
         requirements.extend(THIRD_PARTY_REQUIREMENTS)
+    requirements.extend(BASE_REQUIREMENTS)
     return requirements
 
 

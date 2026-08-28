@@ -86,7 +86,10 @@ def test_late_submission_with_unknown_reason_preserves_uncertainty(claim_factory
     result = evaluate_coverage(claim, facts_factory())
     assert result.assessment is CoverageAssessment.POSSIBLY_COVERED
     assert result.triggered_exclusions == []
-    assert "Valid reason for submission more than 30 days after the incident" in result.unresolved_information
+    unresolved = " ".join(result.unresolved_information)
+    assert "45 days" in unresolved
+    assert "more-than-30-day Policy condition" in unresolved
+    assert "No valid reason for late submission has been confirmed" in unresolved
 
 
 def test_unknown_fact_is_not_silently_false(claim_factory):

@@ -28,6 +28,7 @@ def test_case_1_missing_third_party_information_routes_manual(
     )
     assert result.recommended_routing.value in fixture["expected_routing"]
     assert "third_party_contact_information" in result.document_check.missing_document_ids
+    assert result.missing_information[0] == "Third-party contact information and evidence are required"
 
 
 def test_case_2_validated_illegal_racing_routes_rejection(
@@ -51,6 +52,7 @@ def test_case_3_theft_without_police_report_routes_manual(
     )
     assert result.recommended_routing.value in fixture["expected_routing"]
     assert "police_report" in result.document_check.missing_document_ids
+    assert result.missing_information[0] == "Police report is required"
 
 
 def test_case_4_validated_policy_risk_signals_route_fraud_review(
@@ -70,6 +72,8 @@ def test_case_4_validated_policy_risk_signals_route_fraud_review(
     )
     assert result.recommended_routing.value in fixture["expected_routing"]
     assert result.recommended_routing is Routing.FRAUD_REVIEW
+    assert "Repeated claims" in result.risk.risk_flags
+    assert "Severe damage with weak evidence" in result.risk.risk_flags
 
 
 def test_case_5_unknown_valid_reason_routes_manual_not_forced_rejection(
@@ -90,3 +94,9 @@ def test_case_5_unknown_valid_reason_routes_manual_not_forced_rejection(
     assert result.recommended_routing.value in fixture["expected_routing"]
     assert result.recommended_routing is Routing.MANUAL_REVIEW
     assert result.coverage.triggered_exclusions == []
+    assert result.coverage.submission_delay_days == 45
+    late_reason = " ".join(result.coverage.unresolved_information)
+    assert "45 days" in late_reason
+    assert "more-than-30-day Policy condition" in late_reason
+    assert "No valid reason for late submission has been confirmed" in late_reason
+    assert "human confirmation" in late_reason

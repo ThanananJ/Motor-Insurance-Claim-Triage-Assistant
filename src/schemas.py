@@ -324,6 +324,7 @@ class ConfirmedTriageResult(BaseModel):
     missing_information: list[str]
     risk_flags: list[str]
     recommended_routing: Routing
+    confidence_level: ConfidenceLevel
     deterministic_reasoning_points: list[str]
     claim_summary: str
     explanation: str

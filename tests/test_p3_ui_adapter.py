@@ -67,7 +67,16 @@ def test_confirmation_true_creates_confirmed_facts_and_corrected_values_reach_p2
     review = service.prepare_claim(claim)
     output = confirm_with_service(service, review, True, *values(event_type="third_party_property_damage", repeated_claims="false"))
     assert output[3] == "Manual review"
+    assert output[4] in {"High", "Medium", "Low"}
+    assert "Third-party contact information and evidence are required" in output[1]
     assert "Pending Human Claim Officer Review" in output[-1]
+
+
+def test_assignment_history_phrase_is_suggested_for_human_confirmation():
+    loaded, _ = claim_values(4)
+    prepared = prepare_with_service(TriageService(StubExtractor()), *loaded)
+    assert prepared[2 + FACT_FIELDS.index("repeated_claims")] == "true"
+    assert prepared[-1] is False
 
 
 @pytest.mark.parametrize(

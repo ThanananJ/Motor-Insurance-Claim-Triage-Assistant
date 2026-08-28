@@ -69,7 +69,13 @@ def evaluate_coverage(claim: ClaimInput, facts: ClaimFacts) -> CoverageEvaluatio
         if facts.late_submission_valid_reason is FactStatus.FALSE:
             triggered.append(EXCLUSION_WORDING["late_submission"])
         elif facts.late_submission_valid_reason is FactStatus.UNKNOWN:
-            unresolved.append("Valid reason for submission more than 30 days after the incident")
+            unresolved.append(
+                f"Claim was submitted {delay_days} days after the incident "
+                f"({claim.incident_date.isoformat()} to {claim.claim_submitted_date.isoformat()}), "
+                "exceeding the more-than-30-day Policy condition. No valid reason for late "
+                f"submission has been confirmed. Policy condition: {EXCLUSION_WORDING['late_submission']}. "
+                "Late-submission exclusion may apply; route to Manual review for human confirmation."
+            )
 
     if triggered:
         assessment = CoverageAssessment.NOT_COVERED

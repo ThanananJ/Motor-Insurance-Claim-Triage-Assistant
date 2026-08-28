@@ -1,122 +1,234 @@
-# Motor Insurance Claim Triage Assistant — Solution Design
+# Motor Insurance Claim Triage Assistant
 
-## 1. Problem and Business Context
+## AI Solution Design
 
-Motor-insurance Claim Officers must interpret free-text claims, compare
-submitted documents with Policy requirements, assess coverage and exclusions,
-and identify risk indicators before routing work. Manual triage is slow and can
-vary between officers.
+> เอกสารนี้อธิบาย Business Problem, แนวคิด Hybrid AI, การเลือก Technique,
+> Workflow ของ Prototype, Human-in-the-Loop และผลการประเมินระบบ
+>
+> แนวคิดหลักของ Solution ยังคงเดิม คือใช้ AI ช่วยทำ Initial Claim Triage
+> โดยแยกงานด้านภาษาออกจาก Business Logic ที่ต้องให้ผลแน่นอน
 
-The prototype addresses three core problems:
+---
 
-1. **Incomplete documents:** identify missing Policy-required documents.
-2. **Coverage and exclusions:** consistently apply covered events, explicit
-   exclusions, and the complete late-submission condition.
-3. **Risk support:** surface confirmed suspicious, inconsistent,
-   repeated-claim, and severe-damage-with-weak-evidence signals without
-   concluding fraud.
+# 1. Business Problem and Pain Points
 
-The MVP checks document presence and evidence-related semantic signals. It does
-not perform OCR, document-authenticity verification, image forensics, or fraud
-investigation. Those are future capabilities.
+## 1.1 Business Background
 
-## 2. Target User and Outcome
+บริษัทประกันรถยนต์ได้รับ Claim จำนวนมาก Claim Officer ต้องอ่าน Claim Description,
+ตรวจเอกสาร, เทียบ Policy, ประเมิน Coverage / Exclusion และสังเกต Risk Signal
+ก่อนส่งเคลมไปยังขั้นตอนที่เหมาะสม
 
-The primary user is a Motor Insurance Claim Officer performing initial claim
-triage. The system produces a structured routing recommendation and reasoning;
-the Claim Officer remains responsible for the final claim decision.
+เมื่อทำด้วย Manual Process ทั้งหมด จะเกิดปัญหา เช่น
 
-The four possible recommendations come directly from the supplied Policy:
-Standard processing, Manual review, Fraud review, and Rejection review. These
-are workflow recommendations, not approval, rejection, fraud, or payment
-decisions.
+| Business Issue | ผลกระทบ |
+|---|---|
+| **Manual review effort** | ใช้เวลาอ่านและเปรียบเทียบข้อมูลหลายส่วนด้วยตนเอง |
+| **Inconsistent triage** | เจ้าหน้าที่แต่ละคนอาจตีความข้อมูลหรือ Policy ต่างกัน |
+| **Missing information** | เอกสารหรือข้อมูลสำคัญอาจถูกพบช้า |
+| **Delayed risk detection** | Exclusion หรือ Risk Signal อาจไม่ถูกส่งต่ออย่างรวดเร็ว |
+| **Slow response** | ต้องติดต่อลูกค้าหลายรอบและเพิ่ม Cycle Time |
 
-## 3. Proposed Hybrid AI Solution
+## 1.2 ปัญหาที่ Solution ต้องการแก้
 
-The implemented prototype combines components according to responsibility:
+Solution โฟกัส Initial Claim Triage ใน 5 เรื่องหลัก:
 
-- **Gradio:** structured input, editable proposals, mandatory confirmation,
-  and result presentation.
-- **Ollama + Local LLM:** advisory semantic understanding of free text.
-- **Exact Policy Context:** grounds extraction in the supplied small Policy.
-- **Pydantic:** validates inputs, model payloads, confirmations, and results.
-- **Rule Engine:** deterministically checks documents, dates, coverage, and
-  exclusions.
-- **Risk Engine:** evaluates human-confirmed Policy risk signals.
-- **Routing Engine:** selects a Policy routing recommendation from deterministic
-  results.
-- **Human-in-the-loop:** verifies every semantic proposal and owns the final
-  decision.
+1. **Claim Understanding** — เข้าใจ Claim Description และ Claim History ที่เป็น Free Text
+2. **Document Checking** — ตรวจเอกสารที่ส่งเทียบกับ Policy
+3. **Coverage / Exclusion** — ประเมินเงื่อนไขความคุ้มครองอย่างสม่ำเสมอ
+4. **Risk Signal** — แสดงสัญญาณที่ควรตรวจสอบต่อ โดยไม่สรุปว่าเป็น Fraud
+5. **Routing Recommendation** — แนะนำ Standard, Manual, Fraud หรือ Rejection Review
 
-## 4. Implemented Architecture
+AI ไม่ใช่ Final Decision Maker และไม่อนุมัติหรือปฏิเสธ Claim ขั้นสุดท้าย
 
-```text
-Claim Officer / Gradio
-        ↓
-ClaimInput validated by Pydantic
-        ↓
-Ollama + Local LLM with Exact Policy Context
-        ↓
-Semantic Fact Proposal
-        ↓
-Pydantic Structured Validation
-        ↓
-MANDATORY Human Confirmation / Correction
-        ↓
-ConfirmedClaimFacts
-        ↓
-TriageService → P0 Deterministic Core
-  ├── Document Rules
-  ├── Coverage / Exclusion Rules
-  ├── Exact Date Calculation
-  ├── Risk Rules
-  └── Routing Rules
-        ↓
-Structured Triage Recommendation + Reasoning
-        ↓
-Human Claim Officer Final Decision
+---
+
+# 2. Target Users and User Journey
+
+## 2.1 Target User
+
+ผู้ใช้งานหลักคือ **Motor Insurance Claim Officer / Claim Agent**
+
+ระบบช่วยให้ Claim Officer เห็นข้อเท็จจริง เอกสารที่ขาด Risk Signal และเหตุผล
+ประกอบการ Routing ได้เร็วและเป็นโครงสร้างมากขึ้น
+
+## 2.2 User Journey
+
+```mermaid
+flowchart LR
+    A[Claim Officer enters claim] --> B[Local LLM proposes facts]
+    B --> C[Officer reviews and corrects]
+    C --> D[Explicit Human Confirmation]
+    D --> E[Policy and deterministic triage]
+    E --> F[Triage Recommendation]
+    F --> G[Claim Officer Final Decision]
 ```
 
-`TriageService` is the two-stage orchestration boundary. `prepare_claim()`
-returns an unconfirmed proposal. `confirm_and_analyze()` accepts only an
-explicit `ConfirmedClaimFacts` contract and is the sole service path into P0.
-Gradio never calls P0 directly.
+Claim Officer สามารถ:
 
-## 5. AI / LLM Responsibilities
+1. กรอก Claim Description, Claim History, Dates และ Submitted Documents
+2. ให้ Local LLM ช่วยเสนอ Semantic Facts
+3. ตรวจและแก้ AI Suggested Facts
+4. ยืนยัน Facts อย่างชัดเจน
+5. ตรวจ Structured Triage Recommendation และ Reasoning
+6. ตัดสินใจหรือดำเนินงานต่อด้วยตนเอง
 
-The Local LLM may understand free-text claim descriptions/history, propose
-event, exclusion, late-reason, and semantic risk facts, preserve uncertainty
-with UNKNOWN, and support summary/explanation.
+---
 
-It must not approve/reject claims, select routing, conclude fraud, calculate
-dates, calculate document completeness, apply deterministic Policy rules,
-invent thresholds, or override an officer correction.
+# 3. AI Use Case Definition
 
-The configured prototype model is `qwen2.5:3b`. It is advisory, not a trusted
-autonomous extractor. Evaluations of qwen2.5:3b, qwen2.5:7b, and qwen3:4b found
-semantic misses and false positives; mandatory human review is therefore a
-safety requirement.
+## 3.1 AI Assistant ทำอะไร
 
-## 6. Technology and Model Selection
+- **Understand Claim Description** — ทำความเข้าใจข้อความ Claim
+- **Semantic Extraction** — ดึงข้อเท็จจริง เช่น Event Type และ Risk Signals
+- **Assess Initial Coverage** — แสดงผลประเมินเบื้องต้นจาก Deterministic Logic
+- **Identify Missing Information** — ระบุเอกสารหรือข้อมูลที่ยังขาด
+- **Identify Risk Flags** — แสดงสัญญาณที่ควรตรวจสอบต่อ
+- **Recommend Routing** — แสดง Routing Recommendation จาก Rule-based Workflow
+- **Summarize and Explain** — สรุป Claim และอธิบายเหตุผลในรูปแบบที่อ่านง่าย
 
-| Area | Implemented technology | Responsibility |
+## 3.2 Input
+
+```text
+Claim ID
+Customer
+Vehicle
+Incident Date
+Claim Submitted Date
+Claim Description
+Documents Submitted
+Customer Claim History
+```
+
+Prototype ใช้ Synthetic Assignment Data เท่านั้น
+
+## 3.3 Output
+
+```text
+Claim Summary
+Initial Coverage Assessment
+Missing Information
+Risk Flags / Signals
+Recommended Routing
+Reasoning
+Explanation
+Prototype Confidence Level: High / Medium / Low
+Pending Human Final Decision
+```
+
+Prototype Confidence Level เป็น Rule-based Heuristic จากข้อมูลที่ยังไม่ครบหรือ
+ยังเป็น UNKNOWN ไม่ใช่ Model Probability และไม่ใช่เปอร์เซ็นต์ที่ LLM สร้างขึ้น
+
+## 3.4 Decision Boundary
+
+AI และระบบสามารถ **Recommend** ได้ แต่ไม่สามารถ Final Approve, Final Reject,
+Authorize Payment, สรุป Fraud หรือทำ Irreversible Business Decision
+
+Final Claim Decision ต้องเป็นของ Human Claim Officer
+
+---
+
+# 4. Conceptual Solution Design
+
+แนวคิดหลักคือ **Hybrid AI Claim Triage Assistant** โดยเลือก Technique ให้เหมาะกับงาน
+แทนการให้ LLM รับผิดชอบทุกอย่าง
+
+```mermaid
+flowchart TD
+    O[Claim Officer] --> UI[Gradio Structured Human-in-the-Loop UI]
+    UI --> W[Workflow Orchestrator / Triage Service]
+    W --> L[Ollama + Local LLM]
+    L --> S[Semantic Extraction]
+    S --> V[Pydantic / Structured Validation]
+    V --> A[AI Suggested Facts — Untrusted]
+    A --> H[Human Review / Correction]
+    H --> C[Explicit Human Confirmation]
+    C --> F[Confirmed Facts]
+    F --> P[Exact Policy Grounding]
+    F --> R[Rule Engine]
+    F --> K[Risk Engine]
+    P --> T[Triage Recommendation]
+    R --> T
+    K --> T
+    T --> D[Claim Officer Final Decision]
+```
+
+หลักการของ Architecture:
+
+> **LLM ใช้กับ Language Understanding**  
+> **Human ใช้ตรวจ Semantic Facts**  
+> **Policy + Rules ใช้กับ Deterministic Triage**  
+> **Human เป็นผู้ตัดสิน Claim ขั้นสุดท้าย**
+
+---
+
+# 5. Technique Selection — ใช้อะไรแก้ปัญหาส่วนไหน
+
+| ขั้นตอน | Technique | เหตุผล |
 |---|---|---|
-| Frontend | Gradio | Structured review and confirmation UI |
-| Local LLM runtime | Ollama | Local advisory inference |
-| Python LLM integration | `langchain-ollama` | Provider communication and structured output |
-| Structured validation | Pydantic | Input, proposal, confirmation, and result contracts |
-| Project/dependencies | `uv` | Reproducible environment and execution |
-| Policy grounding | Exact Policy Context | Immutable small-Policy context |
-| Business logic | Python rule/risk engines | Deterministic Policy evaluation and routing |
-| Testing | pytest | Unit, integration, workflow, and regression tests |
+| เข้าใจ Free-text Claim | Local LLM | Natural Language และ Semantic Understanding |
+| เสนอ Structured Facts | LLM + Pydantic Schema | ทำให้ Claim Officer ตรวจและแก้ค่าได้ |
+| Ground ด้วย Policy | Exact Policy Context | Policy มีขนาดเล็กและต้องรักษาข้อความกฎครบถ้วน |
+| ตรวจ Required Documents | Rule Engine | เปรียบเทียบ Submitted กับ Required ได้แน่นอน |
+| คำนวณวันที่ | Python / Rule Engine | Date Calculation ต้องแม่นยำและทำซ้ำได้ |
+| ตรวจ Coverage / Exclusion | Policy + Rule Engine | ไม่ให้ LLM สร้างหรือตัดสิน Policy Rule เอง |
+| ตรวจ Risk Signal | Risk Engine จาก Confirmed Facts | เป็นสัญญาณเพื่อ Review ไม่ใช่ Fraud Decision |
+| Validate Output | Pydantic | ตรวจ Schema, Type และ Allowed Value |
+| ควบคุม Workflow | Orchestrator | บังคับลำดับ Review → Confirm → Triage |
+| Final Decision | Human | รักษา Governance และ Accountability |
 
-Ollama was selected as the MVP primary runtime because it requires no paid API
-or cloud API key, can keep claim inference local, and operates independently
-from a cloud LLM. Performance depends on local CPU/GPU/RAM, and small models may
-be less accurate than larger cloud models.
+---
 
-The provider interface remains independent of business logic. A cloud LLM can
-be evaluated later without moving Policy or routing decisions into the model.
+# 6. LLM — การใช้ AI กับงานด้านภาษา
+
+## 6.1 หน้าที่ของ LLM
+
+MVP ใช้ **Ollama + Local LLM (`qwen2.5:3b`)** เป็น Primary Runtime ผ่าน
+`langchain-ollama` โดยใช้กับงาน Semantic เช่น:
+
+- Free-text Understanding
+- Event Type Proposal
+- Exclusion-related Fact Proposal
+- Risk / Semantic Signal Proposal
+- Claim Summary และ Explanation Support
+
+ตัวอย่าง:
+
+```text
+Customer crashed while participating in an illegal street race
+        ↓
+LLM proposes: illegal_racing = true
+        ↓
+Human reviews and confirms
+        ↓
+Deterministic Policy logic applies the exclusion
+```
+
+Summary และ Explanation ของ Prototype ปัจจุบันยังเป็นข้อความพื้นฐานที่ประกอบจาก
+ข้อมูลและผล Deterministic เพื่อไม่ให้ LLM เปลี่ยนผลวิเคราะห์
+
+## 6.2 สิ่งที่ LLM ไม่ทำ
+
+LLM ไม่รับผิดชอบ:
+
+- Required Document Checking
+- Exact Date / Numeric Calculation
+- Final Policy Application
+- Routing Selection โดยตรง
+- Final Approval / Rejection
+- Fraud Conclusion
+- Payment Authorization
+
+ผลจาก Local LLM เป็น **AI Suggested Facts** เท่านั้น ไม่ใช่ Business Truth
+
+## 6.3 Model Strategy
+
+Ollama ถูกเลือกเพราะไม่ต้องพึ่ง Paid API หรือ API Key สำหรับ Local Inference,
+Claim Information สามารถอยู่บนเครื่อง และ Prototype ทำงานแยกจาก Cloud Service ได้
+
+คุณภาพและ Latency ขึ้นกับ CPU/GPU/RAM และ Local Model ขนาดเล็กยังมี Semantic
+Miss หรือ False Positive ได้ จึงต้องมี Human Confirmation
+
+Architecture แยก Provider ออกจาก Business Logic:
 
 ```text
 Application
@@ -126,204 +238,393 @@ LLM Provider Layer
     └── Cloud LLM                               ← Optional / Future
 ```
 
-## 7. Policy Grounding
+Cloud LLM Fallback ยังไม่ได้ Implement ใน MVP
 
-`data/policy_rules.md` is the immutable Policy source of truth. The MVP Policy
-is small, so the extractor receives exact Policy text rather than embeddings or
-approximate vector retrieval. Focused extraction may select exact relevant
-sections but never paraphrases them into new rules.
+---
 
-Full production RAG/vector search is a future option for large policy
-libraries, versioned contracts, and citations; it is not implemented here.
+# 7. Policy Grounding / RAG
 
-## 8. Deterministic Rule and Risk Processing
+## 7.1 Policy Grounding — การยึดผลวิเคราะห์กับ Policy
 
-### 8.1 Document Engine
+`data/policy_rules.md` เป็น Policy Source of Truth ระบบใช้ Policy ที่ได้รับ
+แทนการพึ่ง General Model Knowledge เพียงอย่างเดียว
 
-Normalizes known labels and compares submitted document IDs against exact
-Policy requirements. It does not inspect document content or authenticity.
+## 7.2 Current MVP: Exact Policy Context
 
-### 8.2 Coverage, Exclusion, and Date Engine
+Policy ของ Assignment มีขนาดเล็กและคงที่ MVP จึงส่ง Exact Policy Context
+หรือเลือก Exact Relevant Section ให้ Semantic Extraction โดยไม่สร้างกฎใหม่
 
-Evaluates human-confirmed facts and calculates dates with Python. The complete
-late rule remains:
+แนวทางนี้ช่วย:
+
+- ลด Hallucination เกี่ยวกับ Policy
+- รักษาข้อความ Policy ให้ตรวจสอบได้
+- แยก Knowledge ออกจาก Model
+- ทดสอบได้ง่ายในขอบเขต Prototype
+
+## 7.3 Future: Full RAG
+
+Full Vector RAG, Embeddings และ Vector Database **ยังไม่ได้ Implement**
+แต่สามารถเพิ่มภายหลังเมื่อ Policy Knowledge Base มีขนาดใหญ่ มีหลาย Version
+หรือต้องค้น Source Reference จำนวนมาก
+
+---
+
+# 8. Rule Engine — กลไกประมวลผลกฎ
+
+Rule Engine ใช้กับ Business Logic ที่ต้องให้ผลแน่นอน ตรวจสอบได้ และทำซ้ำได้
+
+## 8.1 Required Documents
+
+ระบบ Normalize ชื่อเอกสารและเปรียบเทียบ Submitted Documents กับ Requirement
+ตาม Policy รวมถึงเอกสารเฉพาะเหตุการณ์ เช่น Police Report สำหรับ Theft และ
+Third-party Contact Information and Evidence
+
+Prototype ตรวจ Presence ของรายการเอกสาร ไม่ได้อ่านเนื้อหา ตรวจของแท้ หรือทำ OCR
+
+## 8.2 Coverage / Exclusion
+
+ระบบประเมิน Covered Event และ Explicit Exclusion จาก Human-confirmed Facts
+โดยไม่ให้ LLM สร้าง Policy Rule เพิ่ม
+
+## 8.3 Date Calculation
+
+ระบบคำนวณ Incident Date ถึง Claim Submitted Date ด้วย Python และรักษาเงื่อนไขเต็ม:
 
 > Claim filed more than 30 days after the incident without valid reason
 
-A delay over 30 days alone is insufficient. UNKNOWN valid-reason evidence
-preserves uncertainty and human review.
+จำนวนวันที่เกิน 30 วันเพียงอย่างเดียวยังไม่เพียงพอ หาก Valid Reason เป็น UNKNOWN
+ระบบต้องรักษาความไม่แน่นอนและส่ง Human Review
 
-### 8.3 Risk Engine
+## 8.4 Routing Logic
 
-Evaluates only confirmed suspicious pattern, inconsistent story, repeated
-claims, and severe damage with weak evidence. It introduces no repeated-claim
-threshold and always returns `fraud_conclusion = false`.
+Routing ถูกกำหนดจากผล Document, Coverage, Exclusion และ Risk ที่ตรวจแล้ว
+LLM ไม่เลือก Routing โดยตรง
 
-### 8.4 Routing Engine
+Rule Engine ทำให้ผลลัพธ์ **Predictable, Reproducible, Testable และ Auditable**
 
-Deterministically resolves exclusions, validated risk flags, missing/unclear
-information, and standard processing. The LLM never selects routing.
+---
 
-## 9. Pydantic Trust Boundaries
+# 9. Risk Engine — การประเมินสัญญาณความเสี่ยง
 
-Pydantic validates `ClaimInput`, allowed semantic enums, complete structured
-model payloads, TRUE/FALSE/UNKNOWN facts, the unconfirmed `HumanReviewPayload`,
-the matching human-confirmed `ConfirmedClaimFacts`, and result contracts.
+Risk Engine ใช้เฉพาะ Facts ที่ Claim Officer ยืนยันแล้ว เพื่อตรวจ:
 
-Schema validity does not prove semantic correctness. Valid model output still
-requires human confirmation before deterministic processing.
+- Suspicious Pattern
+- Inconsistent Story
+- Repeated Claims
+- Severe Damage + Weak Evidence
 
-## 10. Human-in-the-Loop Safety Architecture
+**Risk Signal ≠ Fraud Decision**
 
-Human Confirmation is mandatory. Local-model evaluation showed semantic misses
-and routing-changing false positives. The UI therefore presents every proposed
-fact as editable and requires the Claim Officer to confirm or correct it.
+Fraud Review เป็น Routing สำหรับการตรวจสอบเพิ่มเติม ไม่ใช่ข้อสรุปว่าเกิด Fraud
+และระบบไม่สร้าง Numeric Repeated-claim Policy Threshold
 
-Changing claim input or switching a demo case invalidates the prior proposal,
-confirmation, and result. Unchecked confirmation cannot invoke P0. The
-officer's corrected value overrides the model proposal.
+ข้อความ `4 claims in past 12 months` เป็น Explicit Evidence ของ Assignment Fixture
+ที่ใช้เสนอ `repeated_claims = true` ให้ Human ตรวจ ไม่ใช่กฎสากลของ Policy
 
-After P0 returns a recommendation, the UI still displays “Final Decision:
-Pending Human Claim Officer Review.” This preserves human verification before
-P0 and final decision ownership afterward.
+---
 
-## 11. Prompt Design
+# 10. Workflow Orchestrator
 
-The approved prompt design has five parts:
+Orchestrator ควบคุมลำดับการทำงานให้ Trust Boundary ไม่ถูกข้าม
 
-1. **System role and decision boundary:** extraction only; no routing or final
-   decision.
-2. **Exact Policy context:** immutable Policy grounding.
-3. **Claim context as untrusted data:** claim text cannot override instructions.
-4. **Focused task instructions:** narrow fields and TRUE/FALSE/UNKNOWN semantics.
-5. **Structured output contract:** JSON-schema output validated by Pydantic.
-
-Details are in `prompts/prompt-design.md`; templates are in `prompts/`.
-
-## 12. Failure and Recovery Handling
-
-```text
-Ollama/provider/validation failure
-        ↓
-Safe all-UNKNOWN proposal
-        ↓
-Claim Officer enters/corrects facts
-        ↓
-Mandatory Human Confirmation
-        ↓
-Deterministic triage continues
+```mermaid
+flowchart TD
+    A[Receive and validate Claim] --> B[Local LLM proposes semantic facts]
+    B --> C[Pydantic validates structure]
+    C --> D[Claim Officer reviews / corrects]
+    D --> E{Explicitly confirmed?}
+    E -- No --> D
+    E -- Yes --> F[Confirmed Facts]
+    F --> G[Policy + Document + Coverage + Risk Rules]
+    G --> H[Deterministic Routing Recommendation]
+    H --> I[Structured Result]
+    I --> J[Claim Officer Final Decision]
 ```
 
-The application does not repair semantics with keywords, regexes, hard-coded
-Assignment answers, or invented Policy logic. UI errors remain concise.
+Assignment นี้ใช้ Deterministic Workflow แทน Fully Autonomous Agent เพราะควบคุม
+Business Rule, Test, Debug และ Explain ได้เหมาะกับ Prototype มากกว่า
 
-## 13. Gradio Prototype
+---
 
-The implemented single page contains structured claim input and Cases 1–5,
-real advisory analysis, editable facts, explicit confirmation, and coverage,
-missing-document, risk, routing, reasoning, summary, explanation, and final
-human-decision outputs. The case loader copies inputs only; it never injects
-expected facts or routing.
+# 11. Frontend — Gradio Structured Human-in-the-Loop UI
 
-## 14. Data Requirements
+Initial UX Concept คือ **Chatbot + Structured Panel** เพราะการสนทนาด้วยภาษา
+ธรรมชาติอาจสะดวกกับ Business Workflow ของ Claim Officer
 
-MVP data includes claim ID, customer, vehicle, incident/submission dates,
-description, document labels, and claim history. Only synthetic Assignment data
-and the supplied Policy are used.
+สำหรับ MVP เลือก Implement **Structured Claim Triage Interface** ก่อน เพื่อให้:
 
-Future data may include versioned policies, authenticated claim records, OCR
-output, document metadata, and investigation outcomes.
+- AI Suggested Facts มองเห็นชัด
+- Human Correction ทำได้โดยตรง
+- Explicit Confirmation ชัดเจน
+- ขอบเขตระหว่าง AI และ Deterministic Logic สาธิตได้ง่าย
+- Demo Flow มีความปลอดภัยและลดความกำกวม
 
-## 15. Evaluation and Final Results
+Chatbot จึงเป็น Future Interface Enhancement ไม่ใช่ Current Feature
 
-Evaluation separates deterministic tests, provider/schema tests, model
-experiments, service trust-boundary tests, UI-adapter tests, and live smoke
-tests. Failed experiments remain in `results/test-results.md`.
+## 11.1 Step 1 — Claim Information
 
-| Case | Final prototype routing | Result |
+Claim Officer กรอก Description, Claim History, Dates และ Submitted Documents
+
+## 11.2 Step 2 — AI Suggested Facts
+
+Local LLM เสนอ Event Type, Exclusion / Late Reason Facts และ Risk Signals
+ทุกค่าปรับแก้ได้และยังไม่ถูกเชื่อถือจนกว่า Claim Officer จะ Confirm
+
+## 11.3 Step 3 — Triage Recommendation
+
+หลัง Confirmation ระบบแสดง Initial Coverage Assessment, Missing Information,
+Risk Flags, Recommended Routing, Reasoning, Claim Summary, Explanation,
+Prototype Confidence Level และสถานะ Pending Human Final Decision
+
+---
+
+# 12. Human-in-the-Loop
+
+Human Confirmation เป็น Trust Boundary สำคัญของ Solution:
+
+```text
+AI Suggested Facts (UNTRUSTED)
+        ↓
+Claim Officer Review / Correction
+        ↓
+Explicit Human Confirmation
+        ↓
+Confirmed Facts (TRUSTED INPUT)
+        ↓
+Deterministic Triage
+        ↓
+Recommendation
+        ↓
+Claim Officer Final Decision
+```
+
+Pydantic ตรวจว่า Output มี Structure, Type และ Allowed Value ถูกต้อง แต่ไม่สามารถ
+รับรองว่า LLM เข้าใจความหมายถูกต้อง Human จึงต้องตรวจ Semantic Correctness
+
+Unconfirmed AI Facts ไม่สามารถเข้าสู่ Deterministic Triage ได้ เมื่อ Claim Input
+เปลี่ยน ระบบจะยกเลิก Proposal, Confirmation และ Result เดิม
+
+AI เป็น **Decision Support System** ไม่ใช่ Decision Maker
+
+---
+
+# 13. Data Requirements
+
+## Claim Data
+
+Claim ID, Customer, Vehicle, Incident Date, Claim Submitted Date,
+Claim Description, Documents Submitted และ Customer Claim History
+
+## Policy Data
+
+Covered Events, Exclusions, Required Documents และ Routing Guidance จาก Policy
+ที่ได้รับ
+
+## Future Data
+
+Real Policy Documents, Claim Database, Document Metadata, OCR Results,
+Fraud Investigation Outcomes และ Audit Records
+
+---
+
+# 14. Prompting / Policy / Workflow Design
+
+Prompt Design แบ่ง Responsibility เป็น 5 ส่วน:
+
+1. **System Role and Decision Boundary** — LLM ทำ Semantic Extraction ไม่ทำ Routing
+2. **Exact Policy Context** — ใช้ Policy ที่ได้รับเป็น Grounding
+3. **Claim Context as Untrusted Data** — Claim Text เป็น Data ไม่ใช่ Instruction
+4. **Focused Task Instructions** — แยกงาน Event/Exclusion, Risk และ Late Reason
+5. **Structured Output Contract** — จำกัด Output และ Validate ด้วย Pydantic
+
+## TRUE / FALSE / UNKNOWN
+
+| Value | ความหมาย |
+|---|---|
+| **TRUE** | Evidence สนับสนุน Fact อย่างชัดเจน |
+| **FALSE** | Evidence สนับสนุนด้านตรงข้ามอย่างชัดเจน |
+| **UNKNOWN** | ข้อมูลไม่เพียงพอหรือยังยืนยันไม่ได้ |
+
+Missing Information ต้องไม่ถูกเปลี่ยนเป็น FALSE โดยอัตโนมัติ UNKNOWN เป็น Safe
+State ไม่ใช่ Error หาก Ollama หรือ Validation ล้มเหลว ระบบคืน UNKNOWN ให้ Claim
+Officer แก้และ Confirm ก่อนดำเนิน Deterministic Triage ต่อ
+
+รายละเอียด Prompt อยู่ใน `prompts/prompt-design.md` และ `prompts/`
+
+---
+
+# 15. Evaluation Method and Results
+
+Evaluation แบ่งเป็นสองชั้น:
+
+## 15.1 Deterministic Unit Tests
+
+ทดสอบ Required Documents, Date Calculation, Policy Exclusion, Risk Escalation,
+Routing Logic, Pydantic Contract และ Human-confirmation Enforcement
+
+## 15.2 LLM + End-to-End Evaluation
+
+ทดสอบ Semantic Extraction, UNKNOWN Handling, Structured Output, Local Ollama,
+Human Correction และ Assignment Workflow ตั้งแต่ Claim Input ถึง Routing
+
+ผล Automated Regression ล่าสุด:
+
+> **118 passed, 0 failed, 0 warnings**
+
+| Assignment Case | Final Prototype Routing | Result |
 |---|---|---|
-| 1 | Manual review | PASS |
-| 2 | Rejection review | PASS |
-| 3 | Manual review | PASS |
-| 4 | Fraud review | PASS |
-| 5 | Manual review | PASS |
+| Case 1 — Collision / missing third-party information | Manual review | PASS |
+| Case 2 — Illegal racing exclusion | Rejection review | PASS |
+| Case 3 — Theft / missing police report | Manual review | PASS |
+| Case 4 — Repeated claims + severe damage + weak evidence | Fraud review | PASS |
+| Case 5 — Late submission uncertainty | Manual review | PASS |
 
-Final automated baseline: 115 passed, 0 failed, 0 warnings. Model accuracy
-alone is not the acceptance criterion; safe correction and unchanged
-deterministic outcomes are.
+ผลนี้ไม่ใช่ LLM Accuracy 100% การทดสอบพบ Semantic Miss และ False Positive
+จาก Local Model หลายกรณี ซึ่งเป็นเหตุผลที่ Human Review และ Correction เป็นข้อบังคับ
 
-## 16. Risks and Mitigations
+---
 
-| Risk | Implemented mitigation |
-|---|---|
-| Semantic miss or false positive | Mandatory editable human confirmation |
-| Hallucinated Policy behavior | Exact Policy context plus deterministic rules |
-| Malformed model output | Pydantic validation and UNKNOWN fallback |
-| Prompt injection in claim text | Explicit untrusted-data boundary |
-| Ollama unavailable | UNKNOWN proposal and manual continuation |
-| Stale review after claim change | UI state invalidation |
-| Autonomous business decision | P0 routing and final human boundary |
-| Local latency | Small local model and documented fallback |
+# 16. Risks and Mitigation
 
-## 17. Implemented MVP Scope
+| Risk | Implemented Mitigation | Future Production Control |
+|---|---|---|
+| Hallucinated Policy behavior | Exact Policy Grounding + Deterministic Rules + Human Confirmation | Versioned Policy retrieval and citation audit |
+| Semantic miss / false positive | Editable AI Suggested Facts + mandatory confirmation | Stronger-model evaluation and monitoring |
+| Malformed output | Pydantic Validation + UNKNOWN fallback | Schema/version observability |
+| Prompt Injection | Treat Claim Input as Untrusted Data | Security testing and content controls |
+| Ollama unavailable | UNKNOWN + manual correction + deterministic continuation | Provider failover and operational monitoring |
+| Stale review | Invalidate result when Claim Input changes | Persistent workflow state and audit log |
+| Autonomous decision risk | Deterministic routing + Human Final Decision | RBAC and formal approval workflow |
+| Privacy | Synthetic data and local inference | PII governance and retention controls |
+| Local latency | Practical local model + documented limitation | Hardware sizing and performance monitoring |
 
-Implemented: Gradio review UI; Ollama advisory extraction through
-`langchain-ollama`; exact Policy grounding; Pydantic validation; mandatory
-confirmation through `TriageService`; deterministic engines; safe fallback;
-Cases 1–5; tests; and runbooks.
+Future controls ในคอลัมน์สุดท้ายยังไม่ได้ Implement ใน MVP
 
-Not implemented: final claim decisions/payments, OCR/file/image analysis,
-auth/RBAC, persistence, production monitoring/deployment, vector database/full
-production RAG, autonomous agents, or cloud LLM fallback.
+---
 
-## 18. Repository Structure
+# 17. MVP Scope and Roadmap
+
+## 17.1 Current MVP
+
+- Gradio Structured Human-in-the-Loop UI
+- Ollama + Local LLM ผ่าน `langchain-ollama`
+- Semantic Extraction และ AI Suggested Facts
+- Pydantic Structured Validation
+- Human Review, Correction และ Explicit Confirmation
+- Exact Policy Grounding
+- Rule Engine และ Risk Engine
+- Deterministic Routing Recommendation
+- Structured Result และ Prototype Confidence Level
+- Assignment Cases 1–5 และ pytest Regression
+
+## 17.2 Not Implemented
+
+- Conversational Chatbot
+- OCR และ Document Authenticity Detection
+- Production Fraud Model
+- Full Vector RAG / Vector Database
+- Authentication / RBAC
+- Persistence และ Production Monitoring
+- Enterprise Deployment
+- Cloud LLM Fallback
+- Final Claim Decision หรือ Payment Authorization
+
+## 17.3 Roadmap
+
+1. **Document Intelligence** — OCR, Classification, Extraction, Cross-document Validation
+2. **Policy Knowledge** — Versioned Policy และ Full RAG สำหรับข้อมูลขนาดใหญ่
+3. **Fraud Intelligence** — Historical Analytics, Anomaly Detection, Fraud Scoring
+4. **Productionization** — Integration, RBAC, Persistence, Monitoring และ Audit
+5. **Interface Enhancement** — Chatbot ที่ทำงานร่วมกับ Structured Panel
+
+---
+
+# 18. Repository Structure
+
+Repository แยก UI, AI, Policy และ Deterministic Logic ออกจากกัน เพื่อให้เปลี่ยน
+Model หรือ Frontend ได้โดยไม่ย้าย Policy Decision เข้า LLM
 
 ```text
-app.py                  Gradio entry point and thin UI adapter
-data/                   immutable Policy and Assignment cases
-docs/                   solution design, limitations, demo runbook
-prompts/                prompt design and extraction templates
-results/                historical and final validation evidence
-scripts/                controlled local-model evaluation harnesses
+app.py                  Gradio UI และ Human-in-the-Loop interaction
+data/                   Policy source และ Assignment cases
+docs/                   Solution Design, runbook และ limitations
+prompts/                Prompt design และ extraction templates
+results/                Evaluation evidence
+scripts/                Local-model evaluation tools
 src/
-  llm/                  provider abstraction and Ollama integration
-  policy/               exact Policy loader/retriever
-  rules/                deterministic engines
-  services/             extraction, confirmation, explanation
-  orchestrator.py       P0 deterministic composition
+  llm/                  Provider abstraction และ Ollama integration
+  policy/               Exact Policy loader / retriever
+  rules/                Document, coverage, risk และ routing rules
+  services/             Extraction, orchestration และ explanation
+  orchestrator.py       Deterministic triage composition
   schemas.py            Pydantic contracts
-tests/                  unit, integration, workflow, and UI tests
+tests/                  Unit, integration, workflow และ UI tests
 ```
 
-`CODEX_HANDOFF.md` and `CODEX_PROTOTYPE_INSTRUCTIONS_with_policy.md` are
-git-ignored coordination files and are not submission artifacts. Local `.env`,
-virtual environments, caches, and model binaries are excluded.
+`CODEX_HANDOFF.md`, Local `.env`, caches, virtual environments และ Local Model
+ไม่ใช่ Final Submission Artifacts
 
-## 19. Assignment Requirement Mapping
+---
 
-| Required area | Design section |
+# 19. Mapping กับ Required Sections ของ Assignment
+
+| Required Section | อยู่ในเอกสารส่วน |
 |---|---|
-| Business problem and target user | Sections 1–2 |
-| AI use case and architecture | Sections 3–5 |
-| Technology/model selection | Section 6 |
-| Policy grounding | Section 7 |
-| Rule/risk processing | Section 8 |
-| Structured validation | Section 9 |
-| Human-in-the-loop | Section 10 |
-| Prompt/workflow design | Sections 11–12 |
-| Prototype and data | Sections 13–14 |
-| Evaluation | Section 15 |
-| Risks and mitigations | Section 16 |
-| MVP scope and roadmap | Sections 17 and 20 |
+| Business problem and pain points | Section 1 |
+| Target users and user journey | Section 2 |
+| AI use case definition | Section 3 |
+| Conceptual / technical solution design | Sections 4, 10–12 |
+| Model and technique selection | Sections 5–9 |
+| Data requirements | Section 13 |
+| Prompting / Policy / workflow design | Section 14 |
+| Evaluation method | Section 15 |
+| Risks and mitigation | Section 16 |
+| MVP scope and roadmap | Section 17 |
+| Repository structure | Section 18 |
 
-## 20. Limitations and Roadmap
+Design นี้ครอบคลุม Required Sections ของ Part 1 — AI Solution Design
 
-The MVP is a local, single-user, synthetic-data prototype. Semantic quality and
-latency depend on local hardware; every proposal requires human review.
-Explanation is basic and deterministic. Exact context suits the small Policy
-but is not a production knowledge system.
+---
 
-Future work may evaluate a stronger model, add OCR and authenticity analysis,
-introduce production RAG for larger policies, persist claims, add auth/RBAC and
-monitoring, and prepare enterprise deployment. These items do not change the
-current Policy or human decision boundary.
+# 20. Solution Summary
+
+Solution คือ **Hybrid AI-assisted Motor Insurance Claim Triage Assistant**
+
+### LLM
+
+> เข้าใจ Free Text → เสนอ Semantic Facts → สนับสนุน Summary / Explanation
+
+### Policy Grounding
+
+> ใช้ Exact Policy เป็น Source of Truth และเตรียมแนวทาง Full RAG สำหรับอนาคต
+
+### Rule Engine
+
+> Required Documents → Date Calculation → Coverage / Exclusion → Routing
+
+### Risk Engine
+
+> ประเมิน Confirmed Risk Signals เพื่อแนะนำ Review โดยไม่สรุป Fraud
+
+### Pydantic / Structured Validation
+
+> ตรวจ Schema, Type และ Allowed Value แต่ไม่แทน Human Semantic Review
+
+### Workflow Orchestrator
+
+> บังคับลำดับ AI Proposal → Human Confirmation → Deterministic Triage
+
+### Gradio Structured UI
+
+> ทำให้ AI Suggested Facts, Human Correction, Confirmation และ Result มองเห็นชัด
+
+### Human
+
+> ตรวจและยืนยันข้อเท็จจริง → พิจารณา Recommendation → ตัดสิน Claim ขั้นสุดท้าย
+
+---
+
+> **Design Principle:**  
+> ใช้ AI ในสิ่งที่ AI ทำได้ดี  
+> ใช้ Deterministic Rules ในสิ่งที่ต้องแม่นยำ  
+> และรักษา Human Decision Boundary สำหรับการตัดสิน Claim ขั้นสุดท้าย

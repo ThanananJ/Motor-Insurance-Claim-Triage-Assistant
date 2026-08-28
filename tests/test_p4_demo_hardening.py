@@ -45,7 +45,10 @@ def test_claim_change_invalidates_review_confirmation_and_result_state():
 
 def test_new_analysis_clears_previous_result_panel():
     cleared = clear_result_ui()
-    assert cleared[:7] == ("", "No result yet.", "No result yet.", "", "No result yet.", "", "")
+    assert cleared[:8] == (
+        "", "No result yet.", "No result yet.", "", "No result yet.",
+        "No result yet.", "", "",
+    )
     assert "Pending Human Claim Officer Review" in cleared[-1]
 
 
