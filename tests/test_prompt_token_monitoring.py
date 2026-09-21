@@ -4,7 +4,7 @@ import sqlite3
 from types import SimpleNamespace
 
 from src.config import AppConfig
-from src.llm.base import LLMTimeoutError
+from src.llm.base import LLMStructuredOutputError, LLMTimeoutError
 from src.monitoring.dashboard import technical_dashboard
 from src.monitoring.models import EventType, MonitoringEvent
 from src.monitoring.prompt_tokens import PromptTokenCounter, PromptTokenResult, _load_tokenizer
@@ -140,6 +140,28 @@ def test_provider_timeout_keeps_preflight_token_count(claim_factory, tmp_path):
     rows = repository.query()
     assert any(row["event_type"] == "LLM_PROMPT_PREPARED" and row["prompt_token_count"] == 845 for row in rows)
     assert any(row["event_type"] == "LLM_PROMPT_FAILED" and row["provider_error_category"] == "PROVIDER_TIMEOUT" for row in rows)
+    prepared = [row for row in rows if row["event_type"] == "LLM_PROMPT_PREPARED"]
+    assert {row["request_id"] for row in prepared} == {"request-timeout"}
+
+
+def test_retry_attempts_keep_the_same_request_id(claim_factory, tmp_path):
+    class RetryProvider(CountingProvider):
+        def invoke_structured(self, prompt, schema):
+            self.calls += 1
+            if self.calls == 1:
+                raise LLMStructuredOutputError("invalid structure")
+            return {name: "unknown" for name in schema.model_fields}
+
+    repository = MonitoringRepository(tmp_path / "monitoring.db")
+    extractor = FocusedClaimExtractor(
+        RetryProvider(), FixedPolicyRetriever(), token_counter=FixedCounter(token_result(845)),
+        monitoring_service=MonitoringService(repository),
+    )
+    extractor.set_monitoring_context("request-retry")
+    extractor.extract(claim_factory())
+    prepared = [row for row in repository.query() if row["event_type"] == "LLM_PROMPT_PREPARED"]
+    assert {row["request_id"] for row in prepared} == {"request-retry"}
+    assert {row["retry_count"] for row in prepared} == {0, 1}
 
 
 def test_safe_migration_preserves_existing_rows(tmp_path):
@@ -162,5 +184,5 @@ def test_dashboard_prompt_table_and_null_tokens(tmp_path):
     repository.insert(MonitoringEvent(request_id="r", event_type=EventType.LLM_PROMPT_PREPARED, prompt_name="focused-history-risk", token_count_available=False, token_count_error_category="TOKENIZER_UNAVAILABLE", context_status="UNKNOWN"))
     outputs = technical_dashboard(repository)
     assert "Prompt Token Capacity" in outputs[1]
-    assert outputs[2][0][1] == "845 / 32,512"
-    assert outputs[2][1][1] == "Unavailable"
+    assert outputs[2][0][7] == "845 / 32,512"
+    assert outputs[2][1][7] == "Unavailable"

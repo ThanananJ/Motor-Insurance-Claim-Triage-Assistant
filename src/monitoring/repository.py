@@ -82,6 +82,9 @@ class MonitoringRepository:
             if value and value != "All":
                 clauses.append(f"{column} = ?")
                 params.append(value)
+        if filters.request_id_prefix and filters.request_id_prefix.strip():
+            clauses.append("request_id LIKE ?")
+            params.append(filters.request_id_prefix.strip() + "%")
         if filters.synthetic is not None:
             clauses.append("is_synthetic = ?")
             params.append(int(filters.synthetic))

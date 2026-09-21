@@ -174,7 +174,7 @@ Strategy A (`current`) is the production default. Strategy B (`minimal-json`) is
 - `PROVIDER_TIMEOUT` — the bounded provider call exceeded its deadline.
 - `INCONCLUSIVE` — evidence was insufficient for a comparison decision.
 
-Key metrics include accuracy, precision, recall, F1, schema validity, critical-risk recall, critical-exclusion recall, safe-fallback rate, and human-boundary compliance. Always read percentages from small datasets together with their numerator and denominator. Reports are written under `results/evaluation/`; see [`evaluation/README.md`](evaluation/README.md) for gates, datasets, and privacy details.
+Key metrics include accuracy, precision, recall, F1, schema validity, critical-risk recall, critical-exclusion recall, safe-fallback rate, and human-boundary compliance. Always read percentages from small datasets together with their numerator and denominator. Reports are written under `results/evaluation/`; default `latest-*` and `runs/` artifacts are local/generated and Git-ignored, while explicitly named redacted baseline/final evidence directories remain curated and tracked. See [`evaluation/README.md`](evaluation/README.md) for gates, datasets, and privacy details.
 
 ## Runtime Monitoring
 
@@ -193,7 +193,9 @@ Monitoring observes the workflow but never changes Policy, deterministic routing
 
 The application automatically creates `data/runtime_monitoring.db` when monitoring first initializes. Git ignores `*.db` and SQLite journal/WAL/SHM files; never commit them.
 
-Monitoring stores only allow-listed categories, counts, status, UUID correlation, UTC timestamps, versions, route/coverage outputs, and latency/validation/fallback metadata. It does not store raw claims, full prompts, raw model responses, names, contact details, vehicle/policy/claim identifiers, secrets, PII, or human free-text notes.
+Monitoring stores only allow-listed categories, counts, status, UUID correlation, UTC timestamps, versions, route/coverage outputs, and latency/validation/fallback metadata. One Claim Form submit creates one full UUID `request_id`; every event from that workflow—including the three focused-prompt token rows and any retry attempts—keeps that same ID. The dashboard shows the first eight characters for scanning and retains the full ID in an adjacent copyable column. Three rows with one Request therefore mean one submit with three focused prompts, not three submits. Legacy rows without an ID are labelled `LEGACY/UNKNOWN`; the dashboard never invents a replacement UUID.
+
+SQLite timestamps remain UTC. Both dashboards convert them only for presentation to `Asia/Bangkok` (`UTC+7`) in `YYYY-MM-DD HH:MM:SS` form. Date filters are explicitly Thailand time and are converted back to UTC query boundaries, including local-midnight boundaries. Monitoring does not store raw claims, full prompts, raw model responses, names, contact details, vehicle/policy/claim identifiers, secrets, PII, or human free-text notes.
 
 ### Prompt Token Monitoring
 
@@ -239,10 +241,10 @@ Do not delete the database file or use broad SQL deletion as the normal cleanup 
 
 1. Run `uv run python app.py` and open the Gradio URL.
 2. Open **Technical Dashboard**.
-3. Choose Synthetic, Runtime, or All data; set UTC date, environment, model, prompt, status, and error filters.
+3. Choose Synthetic, Runtime, or All data; set Thailand (`UTC+7`) date, environment, model, prompt, status, error, and optional Request ID/prefix filters.
 4. Select **Refresh Technical Dashboard**.
 
-It shows total requests, completed/failed workflow, provider success/errors, schema pass rate, fallback rate, average/P95 latency, error/fallback distributions, version breakdown, health, prompt-token capacity cards, a per-focused-prompt `Input Prompt Tokens / Max Prompt Tokens` table, and context-usage trend. Existing filters also apply to token data, with an additional prompt-name filter.
+It shows total requests, completed/failed workflow, provider success/errors, schema pass rate, fallback rate, average/P95 latency, error/fallback distributions, version breakdown, health, prompt-token capacity cards, a per-focused-prompt `Input Prompt Tokens / Max Prompt Tokens` table, and context-usage trend. Token rows include short/full Request ID, Thailand timestamp, prompt, attempt, capacity, status, and Synthetic/Runtime source. Latest requests appear first while their prompt attempts stay together. Refresh is read-only and creates no monitoring event; SQLite records remain available after an application restart.
 
 Health is `HEALTHY`, `WARNING`, `CRITICAL`, or `NO_DATA`. Initial operational thresholds are:
 
@@ -258,7 +260,7 @@ No matching requests produces `NO_DATA`. These are configurable initial operatio
 
 ### Management Dashboard
 
-Open **Management Dashboard**, select the UTC date range, scenario, route, coverage, and Synthetic/Runtime source, then select **Refresh Management Dashboard**. It shows claim volume, completed triage, Manual Review, Fraud Review, Rejection Review, human override, AI fallback, missing-document cases, and route/coverage distributions.
+Open **Management Dashboard**, select the Thailand (`UTC+7`) date range, scenario, route, coverage, and Synthetic/Runtime source, then select **Refresh Management Dashboard**. It shows claim volume, completed triage, Manual Review, Fraud Review, Rejection Review, human override, AI fallback, missing-document cases, and route/coverage distributions.
 
 A high override rate does not necessarily mean poor model quality: new evidence or Claim Officer judgment may justify a correction. The dashboard is an operational indicator and cannot report final claim accuracy without labelled ground truth.
 

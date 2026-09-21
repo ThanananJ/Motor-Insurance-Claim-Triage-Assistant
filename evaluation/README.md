@@ -21,7 +21,7 @@ uv run python -m evaluation.runner --level all --mode fixture
 
 `fixture` (alias `offline`) needs no Ollama. `live` uses `LLM_PROVIDER`, `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and `OLLAMA_TIMEOUT_SECONDS`. Provider/model failure is reported as `PROVIDER_UNAVAILABLE`; it is never converted to a passing model case. Token counts remain `null` with `token_usage_unavailable: true` because the current provider contract does not expose reliable usage metadata.
 
-Reports are written to `results/evaluation/`: `latest-<level>.json`, per-run JSON, a redacted JSONL audit log, and `latest-summary.md`.
+Reports are written to `results/evaluation/`: `latest-<level>.json`, per-run JSON, a redacted JSONL audit log, and `latest-summary.md`. The default `latest-*.json`, `latest-summary.md`, and `runs/` outputs are local generated artifacts and are Git-ignored because every evaluation run replaces or appends to them. Named evidence directories such as `phase3-final/`, `final-verification/`, and `strategy-comparison/` are curated, redacted snapshots and remain tracked deliberately.
 
 Statuses: `PASS` meets the expected result; `PARTIAL` is reserved for an explicitly incomplete outcome; `FAIL` differs from ground truth; `SKIPPED` means no live case could be assessed; `PROVIDER_UNAVAILABLE` identifies the affected live case.
 

@@ -107,6 +107,7 @@ class MonitoringFilter(BaseModel):
     model_name: str | None = None
     prompt_version: str | None = None
     prompt_name: str | None = None
+    request_id_prefix: str | None = None
     status: str | None = None
     error_category: str | None = None
     scenario_category: str | None = None

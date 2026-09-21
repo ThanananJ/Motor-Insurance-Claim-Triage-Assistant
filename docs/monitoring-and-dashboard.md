@@ -24,7 +24,7 @@ Assemble focused prompt
 
 The tokenizer is `Qwen/Qwen2.5-3B-Instruct`, loaded lazily through Transformers and cached. The model capability is 131,072 total context tokens, but operational decisions use the effective application/Ollama runtime context. The current configured default is `OLLAMA_NUM_CTX=32768`, with 256 reserved output tokens, so `max_prompt_tokens=32512`; `context_source` is `application_num_ctx`.
 
-Each session receives a random UUID `request_id`. UTC events cover request
+Each Claim Form submit receives one random UUID `request_id`. The same full UUID is propagated through request, extraction, all three focused prompts, retry attempts, schema, fallback, confirmation, triage, and completion/failure events. `retry_count` distinguishes attempts without creating a new request. Thus three prompt rows sharing one Request ID represent one workflow, not three claim submissions. The Technical Dashboard shows an eight-character Request value for scanning plus the full copyable ID; missing legacy IDs render as `LEGACY/UNKNOWN` rather than a fabricated UUID. UTC events cover request
 start/completion/failure, extraction start/completion/failure, schema
 validation, fallback, human confirmation/override, deterministic triage, and
 the current unavailable human-final-decision state. Monitoring is attached to
@@ -52,8 +52,10 @@ Token events store only prompt name/version, model/tokenizer identifiers, count 
 The overview shows requests, completion/failure, provider success/errors,
 schema pass, fallback, average/P95 latency, and health. Tables show recent
 category-only failures, error/validation/fallback distributions, and model /
-prompt / policy versions. Filters cover UTC dates, environment, model, prompt,
-status, error category, and synthetic/runtime source. Prompt-token cards show average/P95 per claim, maximum prompt observed, average/highest usage, warning/critical/over-limit counts, and unavailable rate. A per-prompt table displays `Input Prompt Tokens / Max Prompt Tokens`, usage, remaining capacity, and status; a compact trend shows prompt tokens and context usage over time. Prompt name is an additional filter.
+prompt / policy versions. Filters cover Thailand (`UTC+7`) dates, environment, model, prompt,
+status, error category, and synthetic/runtime source. Prompt-token cards show average/P95 per claim, maximum prompt observed, average/highest usage, warning/critical/over-limit counts, and unavailable rate. A per-prompt table displays short/full Request ID, Thailand timestamp, prompt, attempt, `Input Prompt Tokens / Max Prompt Tokens`, usage, remaining capacity, status, and data source. The compact trend carries the same correlation fields. Latest requests appear first, with their prompts/attempts kept together. Prompt name and Request ID/prefix are additional filters.
+
+SQLite continues to store timezone-aware UTC timestamps. Dashboard presentation converts each timestamp with Python `ZoneInfo("Asia/Bangkok")` and displays `YYYY-MM-DD HH:MM:SS` without a misleading `Z`. Date inputs on both dashboards are labelled Thailand (`UTC+7`); naive dates/times are interpreted in Bangkok and converted to UTC before repository filtering. Daily buckets use the Thailand calendar date, including events around local midnight.
 
 Prompt capacity status uses centralized configuration: below 70% is `HEALTHY`, 70–<85% is `WARNING`, 85–100% is `CRITICAL`, above 100% is `OVER_LIMIT`, and unavailable tokenizer/config is `UNKNOWN`. Percentages use maximum prompt tokens, not the 128K model capability.
 
@@ -63,7 +65,7 @@ An `OVER_LIMIT` prompt is never sent to Ollama and is never silently truncated. 
 
 The overview shows claim volume, completed triage, route rates, human override,
 AI fallback, and missing-document cases. Tables show route, coverage, override
-reason, and completed/failed distributions. Filters cover UTC dates, scenario,
+reason, and completed/failed distributions. Filters cover Thailand (`UTC+7`) dates, scenario,
 route, coverage, and synthetic/runtime source.
 
 High override is not automatically poor model quality: new evidence and officer
@@ -93,6 +95,8 @@ document examples. Synthetic rows are labelled and filterable. Nothing seeds on
 app startup. The database is `data/runtime_monitoring.db` and is Git-ignored.
 The seed also includes three per-prompt token rows for healthy, warning,
 critical, over-limit, and tokenizer-unavailable scenarios.
+
+Dashboard refresh performs read-only queries and creates no new events. SQLite persistence means existing monitoring history remains after an application restart. Use the full Request ID to correlate UI observations with database/log investigations without exposing claim content.
 
 Monitoring failure is fail-open: it logs only an exception category and does
 not stop extraction, human confirmation, or deterministic triage.

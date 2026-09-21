@@ -223,8 +223,35 @@ __marimo__/
 CODEX_PROTOTYPE_INSTRUCTIONS_with_policy.md
 CODEX_HANDOFF.md
 
-# Local runtime monitoring database (never commit real or synthetic rows)
+# Runtime monitoring database (never commit real or synthetic rows)
+data/runtime_monitoring.db
+data/runtime_monitoring.db-journal
+data/runtime_monitoring.db-wal
+data/runtime_monitoring.db-shm
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
+
+# Runtime application logs
+logs/
+*.log
+
+# Generated evaluation outputs from the default runner destination.
+# Named baseline/final-verification/strategy-comparison directories remain curated evidence.
+results/evaluation/runs/
+results/evaluation/latest-*.json
+results/evaluation/latest-summary.md
+
+# Test and Python caches
+.codex-pytest-tmp/
+.codex-*-test-temp/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# Local tokenizer/model caches inside the repository
+.cache/
+tokenizer_cache/
+huggingface_cache/
+model_cache/

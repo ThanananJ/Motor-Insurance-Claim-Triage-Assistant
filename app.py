@@ -271,8 +271,8 @@ def build_demo() -> gr.Blocks:
         with gr.Tabs():
             with gr.Tab("Technical Dashboard"):
                 with gr.Row():
-                    tech_start = gr.Textbox(label="Start UTC (ISO-8601)")
-                    tech_end = gr.Textbox(label="End UTC (ISO-8601)")
+                    tech_start = gr.Textbox(label="Start (Thailand, UTC+7; YYYY-MM-DD or ISO-8601)")
+                    tech_end = gr.Textbox(label="End (Thailand, UTC+7; YYYY-MM-DD or ISO-8601)")
                     tech_environment = gr.Dropdown(["All", "local"], value="All", label="Environment")
                     tech_model = gr.Dropdown(["All", "qwen2.5:3b"], value="All", label="Model")
                 with gr.Row():
@@ -281,18 +281,19 @@ def build_demo() -> gr.Blocks:
                     tech_status = gr.Dropdown(["All", "started", "success", "failed", "completed", "safe_fallback"], value="All", label="Status")
                     tech_error = gr.Dropdown(["All", "PROVIDER_TIMEOUT", "PROVIDER_FAILURE", "PROVIDER_OR_VALIDATION_FAILURE"], value="All", label="Error category")
                     tech_source = gr.Dropdown(["All", "Runtime only", "Synthetic only"], value="All", label="Data source")
+                    tech_request = gr.Textbox(label="Request ID or prefix")
                 tech_refresh = gr.Button("Refresh Technical Dashboard")
                 tech_cards = gr.Markdown("### Health: NO_DATA")
                 tech_token_cards = gr.Markdown("### Prompt Token Capacity\nNo token data.")
-                tech_prompt_tokens = gr.Dataframe(headers=["Prompt", "Input Prompt Tokens / Max Prompt Tokens", "Input", "Max", "Usage %", "Remaining", "Status"], label="Input Prompt Tokens / Max Prompt Tokens", interactive=False)
-                tech_token_trend = gr.Dataframe(headers=["Timestamp UTC", "Prompt", "Input Prompt Tokens", "Context usage %"], label="Prompt tokens by focused prompt / context usage trend", interactive=False)
-                tech_trends = gr.Dataframe(headers=["Date UTC", "Requests", "Provider success", "Failures", "Fallbacks", "Average latency ms"], label="Requests / provider / latency trend", interactive=False)
-                tech_failed = gr.Dataframe(headers=["Timestamp UTC", "Request ID", "Category"], label="Recent failures", interactive=False)
+                tech_prompt_tokens = gr.Dataframe(headers=["Request", "Full Request ID", "Timestamp (Thailand, UTC+7)", "Prompt", "Attempt", "Input", "Max", "Input Prompt Tokens / Max Prompt Tokens", "Usage %", "Remaining", "Status", "Data Source"], label="Input Prompt Tokens / Max Prompt Tokens", interactive=False)
+                tech_token_trend = gr.Dataframe(headers=["Request", "Full Request ID", "Timestamp (Thailand, UTC+7)", "Prompt", "Input Prompt Tokens", "Context usage %", "Attempt", "Data Source"], label="Prompt tokens by focused prompt / context usage trend", interactive=False)
+                tech_trends = gr.Dataframe(headers=["Date (Thailand, UTC+7)", "Requests", "Provider success", "Failures", "Fallbacks", "Average latency ms"], label="Requests / provider / latency trend", interactive=False)
+                tech_failed = gr.Dataframe(headers=["Timestamp (Thailand, UTC+7)", "Request", "Full Request ID", "Category"], label="Recent failures", interactive=False)
                 tech_distributions = gr.Dataframe(headers=["Metric", "Category", "Count"], label="Error / validation / fallback distributions", interactive=False)
                 tech_versions = gr.Dataframe(headers=["Model", "Prompt", "Policy", "Count"], label="Version breakdown", interactive=False)
                 tech_refresh.click(
                     lambda *args: technical_dashboard(MONITORING_REPOSITORY, *args),
-                    [tech_start, tech_end, tech_environment, tech_model, tech_prompt, tech_prompt_name, tech_status, tech_error, tech_source],
+                    [tech_start, tech_end, tech_environment, tech_model, tech_prompt, tech_prompt_name, tech_status, tech_error, tech_source, tech_request],
                     [tech_cards, tech_token_cards, tech_prompt_tokens, tech_token_trend, tech_trends, tech_failed, tech_distributions, tech_versions],
                 )
             with gr.Tab("Management Dashboard"):
@@ -301,15 +302,15 @@ def build_demo() -> gr.Blocks:
                     "Dashboard นี้เป็น Operational Indicator ไม่ใช่ Final Claim Accuracy; accuracy ต้องใช้ Label/Ground Truth แยกต่างหาก"
                 )
                 with gr.Row():
-                    management_start = gr.Textbox(label="Start UTC (ISO-8601)")
-                    management_end = gr.Textbox(label="End UTC (ISO-8601)")
+                    management_start = gr.Textbox(label="Start (Thailand, UTC+7; YYYY-MM-DD or ISO-8601)")
+                    management_end = gr.Textbox(label="End (Thailand, UTC+7; YYYY-MM-DD or ISO-8601)")
                     management_scenario = gr.Textbox(value="All", label="Scenario category")
                     management_route = gr.Dropdown(["All", "Standard processing", "Manual review", "Fraud review", "Rejection review"], value="All", label="Route")
                     management_coverage = gr.Dropdown(["All", "Likely covered", "Possibly covered", "Not covered", "Cannot determine"], value="All", label="Coverage")
                     management_source = gr.Dropdown(["All", "Runtime only", "Synthetic only"], value="All", label="Data source")
                 management_refresh = gr.Button("Refresh Management Dashboard")
                 management_cards = gr.Markdown("### Operational overview (NO_DATA)")
-                management_trends = gr.Dataframe(headers=["Date UTC", "Claims", "Overrides", "Missing document cases", "Failures"], label="Volume / override / missing-document trend", interactive=False)
+                management_trends = gr.Dataframe(headers=["Date (Thailand, UTC+7)", "Claims", "Overrides", "Missing document cases", "Failures"], label="Volume / override / missing-document trend", interactive=False)
                 management_distributions = gr.Dataframe(headers=["Metric", "Category", "Count"], label="Route / coverage / override distributions", interactive=False)
                 management_workflow = gr.Dataframe(headers=["Workflow status", "Count"], label="Completed vs failed", interactive=False)
                 management_refresh.click(
