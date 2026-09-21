@@ -469,7 +469,8 @@ Human Correction และ Assignment Workflow ตั้งแต่ Claim Input
 
 ผล Automated Regression ล่าสุด:
 
-> **118 passed, 0 failed, 0 warnings**
+> See the final repository handoff for the current verified pytest count; do not
+> treat a historical count as a permanent baseline.
 
 | Assignment Case | Final Prototype Routing | Result |
 |---|---|---|
@@ -524,7 +525,7 @@ Future controls ในคอลัมน์สุดท้ายยังไม�
 - Production Fraud Model
 - Full Vector RAG / Vector Database
 - Authentication / RBAC
-- Persistence และ Production Monitoring
+- Production-grade persistent claim state, centralized monitoring และ alerting
 - Enterprise Deployment
 - Cloud LLM Fallback
 - Final Claim Decision หรือ Payment Authorization

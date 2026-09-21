@@ -12,6 +12,9 @@ from langchain_ollama import ChatOllama
 
 from src.config import AppConfig
 from src.llm.ollama_provider import OllamaProvider
+from src.monitoring.dashboard import management_dashboard, technical_dashboard
+from src.monitoring.repository import MonitoringRepository
+from src.monitoring.service import MonitoringService
 from src.policy.retriever import ExactPolicyRetriever
 from src.schemas import ClaimFacts, ClaimInput, ConfirmedClaimFacts, EventType, FactStatus
 from src.services.p1_8_ab_extractor import ABConfiguration, P18ABExtractor
@@ -61,7 +64,9 @@ class RuntimeSemanticExtractor:
         return P18ABExtractor(provider, ExactPolicyRetriever(), ABConfiguration.C).extract(claim)
 
 
-TRIAGE_SERVICE = TriageService(RuntimeSemanticExtractor())
+MONITORING_REPOSITORY = MonitoringRepository(ROOT / "data" / "runtime_monitoring.db")
+MONITORING_SERVICE = MonitoringService(MONITORING_REPOSITORY)
+TRIAGE_SERVICE = TriageService(RuntimeSemanticExtractor(), monitoring_service=MONITORING_SERVICE)
 
 
 def optional_date(value: str | None) -> date | None:
@@ -247,6 +252,54 @@ def build_demo() -> gr.Blocks:
             [review_state, proposal_status, event_type, *fact_components, confirmation],
         )
         confirm_button.click(confirm_claim_ui, [review_state, confirmation, event_type, *fact_components], [coverage, missing, risks, routing, confidence, reasoning, summary, explanation, final_notice])
+
+        gr.Markdown("## Runtime Monitoring Dashboards")
+        gr.Markdown("Read-only operational indicators. Dashboard actions cannot approve, reject, or otherwise change a claim.")
+        with gr.Tabs():
+            with gr.Tab("Technical Dashboard"):
+                with gr.Row():
+                    tech_start = gr.Textbox(label="Start UTC (ISO-8601)")
+                    tech_end = gr.Textbox(label="End UTC (ISO-8601)")
+                    tech_environment = gr.Dropdown(["All", "local"], value="All", label="Environment")
+                    tech_model = gr.Dropdown(["All", "qwen2.5:3b"], value="All", label="Model")
+                with gr.Row():
+                    tech_prompt = gr.Dropdown(["All", "focused-v1"], value="All", label="Prompt version")
+                    tech_status = gr.Dropdown(["All", "started", "success", "failed", "completed", "safe_fallback"], value="All", label="Status")
+                    tech_error = gr.Dropdown(["All", "PROVIDER_TIMEOUT", "PROVIDER_FAILURE", "PROVIDER_OR_VALIDATION_FAILURE"], value="All", label="Error category")
+                    tech_source = gr.Dropdown(["All", "Runtime only", "Synthetic only"], value="All", label="Data source")
+                tech_refresh = gr.Button("Refresh Technical Dashboard")
+                tech_cards = gr.Markdown("### Health: NO_DATA")
+                tech_trends = gr.Dataframe(headers=["Date UTC", "Requests", "Provider success", "Failures", "Fallbacks", "Average latency ms"], label="Requests / provider / latency trend", interactive=False)
+                tech_failed = gr.Dataframe(headers=["Timestamp UTC", "Request ID", "Category"], label="Recent failures", interactive=False)
+                tech_distributions = gr.Dataframe(headers=["Metric", "Category", "Count"], label="Error / validation / fallback distributions", interactive=False)
+                tech_versions = gr.Dataframe(headers=["Model", "Prompt", "Policy", "Count"], label="Version breakdown", interactive=False)
+                tech_refresh.click(
+                    lambda *args: technical_dashboard(MONITORING_REPOSITORY, *args),
+                    [tech_start, tech_end, tech_environment, tech_model, tech_prompt, tech_status, tech_error, tech_source],
+                    [tech_cards, tech_trends, tech_failed, tech_distributions, tech_versions],
+                )
+            with gr.Tab("Management Dashboard"):
+                gr.Markdown(
+                    "Human Override สูงไม่ได้แปลว่า Model แย่เสมอไป—อาจเกิดจากข้อมูลใหม่หรือดุลยพินิจของเจ้าหน้าที่ "
+                    "Dashboard นี้เป็น Operational Indicator ไม่ใช่ Final Claim Accuracy; accuracy ต้องใช้ Label/Ground Truth แยกต่างหาก"
+                )
+                with gr.Row():
+                    management_start = gr.Textbox(label="Start UTC (ISO-8601)")
+                    management_end = gr.Textbox(label="End UTC (ISO-8601)")
+                    management_scenario = gr.Textbox(value="All", label="Scenario category")
+                    management_route = gr.Dropdown(["All", "Standard processing", "Manual review", "Fraud review", "Rejection review"], value="All", label="Route")
+                    management_coverage = gr.Dropdown(["All", "Likely covered", "Possibly covered", "Not covered", "Cannot determine"], value="All", label="Coverage")
+                    management_source = gr.Dropdown(["All", "Runtime only", "Synthetic only"], value="All", label="Data source")
+                management_refresh = gr.Button("Refresh Management Dashboard")
+                management_cards = gr.Markdown("### Operational overview (NO_DATA)")
+                management_trends = gr.Dataframe(headers=["Date UTC", "Claims", "Overrides", "Missing document cases", "Failures"], label="Volume / override / missing-document trend", interactive=False)
+                management_distributions = gr.Dataframe(headers=["Metric", "Category", "Count"], label="Route / coverage / override distributions", interactive=False)
+                management_workflow = gr.Dataframe(headers=["Workflow status", "Count"], label="Completed vs failed", interactive=False)
+                management_refresh.click(
+                    lambda *args: management_dashboard(MONITORING_REPOSITORY, *args),
+                    [management_start, management_end, management_scenario, management_route, management_coverage, management_source],
+                    [management_cards, management_trends, management_distributions, management_workflow],
+                )
     return demo
 
 

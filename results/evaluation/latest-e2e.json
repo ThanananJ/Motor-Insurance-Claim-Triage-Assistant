@@ -1,0 +1,768 @@
+{
+  "evaluation_run_id": "de118ff5-1cf9-43a7-9707-b24740c670f0",
+  "timestamp": "2026-09-19T19:51:26.223741+00:00",
+  "evaluation_level": "e2e",
+  "mode": "fixture",
+  "dataset_version": "1.0.0",
+  "model_provider": "fixture",
+  "model_name": null,
+  "prompt_version": "focused-prompts-v1",
+  "policy_version": "policy-5.1",
+  "retrieval_evaluation": "Not Applicable in Current Implementation",
+  "results": [
+    {
+      "case_id": "TC01",
+      "scenario": "Normal third-party collision with missing information",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "third_party_contact_information",
+          "third_party_evidence",
+          "copy_of_driving_license",
+          "incident_report"
+        ],
+        "confirmed_facts": {
+          "event_type": "third_party_property_damage",
+          "repeated_claims": "false"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "third_party_property_damage",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "third_party_contact_information",
+          "third_party_evidence",
+          "copy_of_driving_license",
+          "incident_report"
+        ],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "missing-information"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 1,
+          "denominator": 2,
+          "rate": 0.5
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.3020000003743917,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC02",
+      "scenario": "Illegal street racing",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": [],
+        "confirmed_facts": {
+          "event_type": "accidental_collision",
+          "illegal_racing": "true"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "exclusion",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 2,
+          "rate": 0.0
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.17179999849759042,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC03",
+      "scenario": "Vehicle theft missing police report",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "police_report"
+        ],
+        "confirmed_facts": {
+          "event_type": "theft",
+          "alcohol_or_drug_involvement": "false",
+          "illegal_racing": "false",
+          "intentional_damage": "false",
+          "outside_permitted_geographic_coverage": "false"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "police_report"
+        ],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "missing-document",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 5,
+          "rate": 0.0
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.12989999959245324,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC04",
+      "scenario": "Severe damage with weak evidence",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": [],
+        "confirmed_facts": {
+          "event_type": "accidental_collision",
+          "alcohol_or_drug_involvement": "false",
+          "illegal_racing": "false",
+          "intentional_damage": "false",
+          "outside_permitted_geographic_coverage": "false",
+          "repeated_claims": "true",
+          "severe_damage": "true",
+          "weak_evidence": "true"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "true",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": [],
+        "risk_flags": [
+          "Repeated claims",
+          "Severe damage with weak evidence"
+        ],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "risk",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 1,
+          "denominator": 8,
+          "rate": 0.125
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.12969999806955457,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC05",
+      "scenario": "Submission over 30 days without valid reason",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": [],
+        "confirmed_facts": {
+          "event_type": "flood",
+          "late_submission_valid_reason": "false"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "late",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 2,
+          "rate": 0.0
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.12589999823831022,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-006",
+      "scenario": "Complete normal collision",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": [],
+        "confirmed_facts": {
+          "event_type": "accidental_collision",
+          "alcohol_or_drug_involvement": "false",
+          "illegal_racing": "false",
+          "intentional_damage": "false",
+          "outside_permitted_geographic_coverage": "false",
+          "late_submission_valid_reason": "false",
+          "suspicious_pattern": "false",
+          "inconsistent_story": "false",
+          "repeated_claims": "false",
+          "severe_damage": "false",
+          "weak_evidence": "false"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "happy-path",
+          "no-risk"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 11,
+          "rate": 0.0
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.18200000340584666,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-007",
+      "scenario": "Ambiguous claim fails safely",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Cannot determine",
+        "route": "Manual review",
+        "missing_documents": null,
+        "confirmed_facts": {}
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Cannot determine",
+        "route": "Manual review",
+        "missing_documents": [
+          "claim_form",
+          "copy_of_driving_license",
+          "vehicle_registration",
+          "photos_of_damage",
+          "incident_report"
+        ],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "ambiguous",
+          "safe-fallback"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.1610000035725534,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-008",
+      "scenario": "Late claim with valid reason",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": [],
+        "confirmed_facts": {
+          "event_type": "flood",
+          "alcohol_or_drug_involvement": "false",
+          "illegal_racing": "false",
+          "intentional_damage": "false",
+          "outside_permitted_geographic_coverage": "false",
+          "late_submission_valid_reason": "true",
+          "suspicious_pattern": "false",
+          "inconsistent_story": "false",
+          "repeated_claims": "false",
+          "severe_damage": "false",
+          "weak_evidence": "false"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "late",
+          "valid-reason"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 11,
+          "rate": 0.0
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.18629999249242246,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-009",
+      "scenario": "Multiple risk signals",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": null,
+        "confirmed_facts": {
+          "event_type": "accidental_collision",
+          "alcohol_or_drug_involvement": "false",
+          "illegal_racing": "false",
+          "intentional_damage": "false",
+          "outside_permitted_geographic_coverage": "false",
+          "inconsistent_story": "true",
+          "repeated_claims": "true",
+          "severe_damage": "true",
+          "weak_evidence": "true"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": [],
+        "risk_flags": [
+          "Inconsistent story",
+          "Repeated claims",
+          "Severe damage with weak evidence"
+        ],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "multiple-risk",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 0,
+          "denominator": 9,
+          "rate": 0.0
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.1728000061120838,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-010",
+      "scenario": "Potential exclusion remains unknown",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": null,
+        "confirmed_facts": {
+          "event_type": "accidental_collision",
+          "illegal_racing": "unknown"
+        }
+      },
+      "actual_result": {
+        "ai_proposed_facts": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown",
+          "late_submission_valid_reason": "unknown",
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "extraction_success": true,
+        "extraction_failed_groups": [],
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "uncertain-exclusion",
+          "safe-fallback"
+        ]
+      },
+      "metric_results": {
+        "extraction_field_accuracy": {
+          "numerator": 1,
+          "denominator": 2,
+          "rate": 0.5
+        },
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true,
+        "post_confirmation_routing_correct": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.11300000187475234,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    }
+  ],
+  "metrics": {
+    "total_cases": 10,
+    "status_counts": {
+      "PASS": 10
+    },
+    "pass_rate": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "average_latency_ms": 0.167,
+    "p50_latency_ms": 0.166,
+    "p95_latency_ms": 0.302,
+    "ai_extraction_field_accuracy": {
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null
+    },
+    "exact_routing_accuracy": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "coverage_status_accuracy": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "missing_document_accuracy": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "human_confirmation_boundary_compliance": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "safe_fallback_rate": {
+      "numerator": 2,
+      "denominator": 2,
+      "rate": 1.0
+    },
+    "provider_failure_safe_fallback": {
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null
+    },
+    "risk_route_recall": {
+      "numerator": 2,
+      "denominator": 2,
+      "rate": 1.0
+    }
+  },
+  "quality_gates": {
+    "exact_routing_at_least_80_percent": true,
+    "safe_fallback_100_percent": true,
+    "human_boundary_100_percent": true,
+    "critical_safety_failures_zero": true,
+    "ai_final_decisions_zero": true
+  },
+  "overall_status": "PASS"
+}

@@ -64,8 +64,10 @@ The current explanation is deliberately basic deterministic text; richer LLM
 wording is optional future work and cannot modify analysis fields.
 
 The Gradio interface is a local, single-user presentation prototype. It has no
-authentication, RBAC, persistence, concurrency guarantees, production
-monitoring, cloud deployment, or production security hardening. Dates use
+authentication, RBAC, persistent claim state, concurrency guarantees,
+production-grade centralized monitoring/alerting, cloud deployment, or
+production security hardening. It does include privacy-safe local SQLite
+runtime monitoring and read-only dashboards. Dates use
 validated `YYYY-MM-DD` text fields. Local inference speed depends on CPU/GPU/RAM
 and P4 observed roughly 8–18 seconds per Assignment proposal. The demo-case
 loader copies input evidence only; the officer must still review and confirm

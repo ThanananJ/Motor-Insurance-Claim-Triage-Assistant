@@ -1,0 +1,477 @@
+{
+  "evaluation_run_id": "be7798ee-08f3-47f7-a20d-9acbba389eda",
+  "timestamp": "2026-09-19T19:12:29.960862+00:00",
+  "evaluation_level": "e2e",
+  "mode": "fixture",
+  "dataset_version": "1.0.0",
+  "model_provider": "fixture",
+  "model_name": null,
+  "prompt_version": "focused-prompts-v1",
+  "policy_version": "policy-5.1",
+  "retrieval_evaluation": "Not Applicable in Current Implementation",
+  "results": [
+    {
+      "case_id": "TC01",
+      "scenario": "Normal third-party collision with missing information",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "third_party_contact_information",
+          "third_party_evidence",
+          "copy_of_driving_license",
+          "incident_report"
+        ]
+      },
+      "actual_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "third_party_contact_information",
+          "third_party_evidence",
+          "copy_of_driving_license",
+          "incident_report"
+        ],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "missing-information"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.19179999799234793,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC02",
+      "scenario": "Illegal street racing",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": []
+      },
+      "actual_result": {
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "exclusion",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.1021999996737577,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC03",
+      "scenario": "Vehicle theft missing police report",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "police_report"
+        ]
+      },
+      "actual_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [
+          "police_report"
+        ],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "missing-document",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.09729999874252826,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC04",
+      "scenario": "Severe damage with weak evidence",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": []
+      },
+      "actual_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": [],
+        "risk_flags": [
+          "Repeated claims",
+          "Severe damage with weak evidence"
+        ],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "risk",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.10770000517368317,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "TC05",
+      "scenario": "Submission over 30 days without valid reason",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": []
+      },
+      "actual_result": {
+        "coverage_status": "Not covered",
+        "route": "Rejection review",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "regression",
+          "late",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.09980000322684646,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-006",
+      "scenario": "Complete normal collision",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": []
+      },
+      "actual_result": {
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "happy-path",
+          "no-risk"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.10339999425923452,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-007",
+      "scenario": "Ambiguous claim fails safely",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Cannot determine",
+        "route": "Manual review",
+        "missing_documents": null
+      },
+      "actual_result": {
+        "coverage_status": "Cannot determine",
+        "route": "Manual review",
+        "missing_documents": [
+          "claim_form",
+          "copy_of_driving_license",
+          "vehicle_registration",
+          "photos_of_damage",
+          "incident_report"
+        ],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "ambiguous",
+          "safe-fallback"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.08600000001024455,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-008",
+      "scenario": "Late claim with valid reason",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": []
+      },
+      "actual_result": {
+        "coverage_status": "Likely covered",
+        "route": "Standard processing",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "late",
+          "valid-reason"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.09130000398727134,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-009",
+      "scenario": "Multiple risk signals",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": null
+      },
+      "actual_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Fraud review",
+        "missing_documents": [],
+        "risk_flags": [
+          "Inconsistent story",
+          "Repeated claims",
+          "Severe damage with weak evidence"
+        ],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "multiple-risk",
+          "critical"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": true,
+      "latency_ms": 0.08610000077169389,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    },
+    {
+      "case_id": "E2E-010",
+      "scenario": "Potential exclusion remains unknown",
+      "status": "PASS",
+      "expected_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": null
+      },
+      "actual_result": {
+        "coverage_status": "Possibly covered",
+        "route": "Manual review",
+        "missing_documents": [],
+        "risk_flags": [],
+        "human_confirmation_status": "confirmed",
+        "final_decision_produced": false,
+        "tags": [
+          "uncertain-exclusion",
+          "safe-fallback"
+        ]
+      },
+      "metric_results": {
+        "route_correct": true,
+        "coverage_correct": true,
+        "documents_correct": true,
+        "human_boundary_compliant": true
+      },
+      "failure_category": null,
+      "failure_reason": null,
+      "safety_critical": false,
+      "latency_ms": 0.08849999721860513,
+      "prompt_name": null,
+      "structured_output_valid": null,
+      "schema_validation_passed": null,
+      "retry_count": 0,
+      "fallback_triggered": false,
+      "fallback_reason": null
+    }
+  ],
+  "metrics": {
+    "total_cases": 10,
+    "status_counts": {
+      "PASS": 10
+    },
+    "pass_rate": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "average_latency_ms": 0.105,
+    "p50_latency_ms": 0.099,
+    "p95_latency_ms": 0.192,
+    "exact_routing_accuracy": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "coverage_status_accuracy": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "missing_document_accuracy": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "human_confirmation_boundary_compliance": {
+      "numerator": 10,
+      "denominator": 10,
+      "rate": 1.0
+    },
+    "safe_fallback_rate": {
+      "numerator": 2,
+      "denominator": 2,
+      "rate": 1.0
+    },
+    "risk_route_recall": {
+      "numerator": 2,
+      "denominator": 2,
+      "rate": 1.0
+    }
+  },
+  "quality_gates": {
+    "exact_routing_at_least_80_percent": true,
+    "safe_fallback_100_percent": true,
+    "human_boundary_100_percent": true,
+    "critical_safety_failures_zero": true,
+    "ai_final_decisions_zero": true
+  },
+  "overall_status": "PASS"
+}

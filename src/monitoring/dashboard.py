@@ -1,0 +1,114 @@
+"""Read-only dashboard adapters for Gradio."""
+
+from __future__ import annotations
+
+from collections import Counter
+from datetime import datetime, timezone
+
+from .metrics import summarize
+from .models import MonitoringFilter
+from .repository import MonitoringRepository
+
+
+def _date(value: str | None, *, end: bool = False):
+    if not (value or "").strip():
+        return None
+    parsed = datetime.fromisoformat(value.strip())
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _synthetic(value: str) -> bool | None:
+    return {"Synthetic only": True, "Runtime only": False}.get(value)
+
+
+def _rows(counter: dict) -> list[list]:
+    return [[key, value] for key, value in sorted(counter.items())]
+
+
+def _daily(events: list[dict], *, management: bool = False) -> list[list]:
+    days: dict[str, dict] = {}
+    for item in events:
+        day = item["timestamp_utc"][:10]
+        bucket = days.setdefault(day, {"requests": 0, "success": 0, "failure": 0, "fallback": 0, "latencies": [], "override": 0, "missing": 0})
+        kind = item["event_type"]
+        bucket["requests"] += kind == "REQUEST_STARTED"
+        bucket["success"] += kind == "AI_EXTRACTION_COMPLETED"
+        bucket["failure"] += kind in {"AI_EXTRACTION_FAILED", "REQUEST_FAILED"}
+        bucket["fallback"] += kind == "FALLBACK_TRIGGERED"
+        bucket["override"] += kind == "HUMAN_OVERRIDE_RECORDED"
+        bucket["missing"] += kind == "TRIAGE_COMPLETED" and (item["missing_document_count"] or 0) > 0
+        if item["latency_ms"] is not None:
+            bucket["latencies"].append(item["latency_ms"])
+    if management:
+        return [[day, row["requests"], row["override"], row["missing"], row["failure"]] for day, row in sorted(days.items())]
+    return [[day, row["requests"], row["success"], row["failure"], row["fallback"], round(sum(row["latencies"]) / len(row["latencies"]), 2) if row["latencies"] else None] for day, row in sorted(days.items())]
+
+
+def technical_dashboard(
+    repository: MonitoringRepository, start="", end="", environment="All", model="All",
+    prompt_version="All", status="All", error="All", data_source="All",
+):
+    filters = MonitoringFilter(
+        start_utc=_date(start), end_utc=_date(end, end=True), environment=environment,
+        model_name=model, prompt_version=prompt_version, status=status,
+        error_category=error, synthetic=_synthetic(data_source),
+    )
+    events = repository.query(filters)
+    metrics = summarize(events)
+    if not metrics["total_requests"]:
+        cards = "### Health: NO_DATA\nNo monitoring requests match the selected filters. Timestamps are UTC."
+    else:
+        percent = lambda value: "N/A" if value is None else f"{value:.1%}"
+        cards = (
+            f"### Health: {metrics['health_status']}\n"
+            f"Requests **{metrics['total_requests']}** · Completed **{metrics['completed_requests']}** · Failed **{metrics['failed_requests']}**  \n"
+            f"Provider success **{percent(metrics['provider_success_rate'])}** · Errors **{metrics['provider_error_count']}** · "
+            f"Schema pass **{percent(metrics['schema_validity_rate'])}** · Fallback **{percent(metrics['fallback_rate'])}**  \n"
+            f"Average latency **{metrics['average_latency_ms'] or 0:.1f} ms** · P95 **{metrics['p95_latency_ms'] or 0:.1f} ms** · UTC"
+        )
+    recent_failed = [
+        [event["timestamp_utc"], event["request_id"], event["provider_error_category"] or event["validation_error_category"]]
+        for event in events if event["event_type"] in {"AI_EXTRACTION_FAILED", "REQUEST_FAILED"}
+    ][-20:]
+    versions = Counter(
+        (event["model_name"] or "not_available", event["prompt_version"], event["policy_version"])
+        for event in events if event["event_type"] == "REQUEST_STARTED"
+    )
+    distributions = (
+        [["Provider error", *row] for row in _rows(metrics["error_distribution"])]
+        + [["Validation failure", *row] for row in _rows(metrics["validation_failure_distribution"])]
+        + [["Fallback reason", *row] for row in _rows(metrics["fallback_reason_distribution"])]
+    )
+    return cards, _daily(events), recent_failed, distributions, [[*key, value] for key, value in sorted(versions.items())]
+
+
+def management_dashboard(
+    repository: MonitoringRepository, start="", end="", scenario="All", route="All",
+    coverage="All", data_source="All",
+):
+    events = repository.query(MonitoringFilter(
+        start_utc=_date(start), end_utc=_date(end, end=True), scenario_category=scenario,
+        route=route, coverage_status=coverage, synthetic=_synthetic(data_source),
+    ))
+    metrics = summarize(events)
+    route_counts = metrics["route_distribution"]
+    total_triage = sum(route_counts.values())
+    rate = lambda name: (route_counts.get(name, 0) / total_triage) if total_triage else None
+    percent = lambda value: "N/A" if value is None else f"{value:.1%}"
+    cards = (
+        f"### Operational overview ({'NO_DATA' if not metrics['total_requests'] else 'UTC'})\n"
+        f"Claims **{metrics['total_requests']}** · Completed triage **{total_triage}** · "
+        f"Manual review **{percent(rate('Manual review'))}** · Fraud review **{percent(rate('Fraud review'))}** · "
+        f"Rejection review **{percent(rate('Rejection review'))}**  \n"
+        f"Human override **{percent(metrics['human_override_rate'])}** · AI fallback **{percent(metrics['fallback_rate'])}** · "
+        f"Missing-document cases **{percent(metrics['missing_document_case_rate'])}**"
+    )
+    distributions = (
+        [["Route", *row] for row in _rows(route_counts)]
+        + [["Coverage", *row] for row in _rows(metrics["coverage_distribution"])]
+        + [["Override reason", *row] for row in _rows(metrics["override_reason_distribution"])]
+    )
+    workflow = [["Completed", metrics["completed_requests"]], ["Failed", metrics["failed_requests"]]]
+    return cards, _daily(events, management=True), distributions, workflow

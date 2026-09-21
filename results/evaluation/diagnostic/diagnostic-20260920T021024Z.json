@@ -1,0 +1,569 @@
+{
+  "diagnostic_only": true,
+  "created_at": "2026-09-20T02:10:24.830762+00:00",
+  "selected_case_ids": [
+    "MODEL-EVENT-002",
+    "MODEL-RISK-001",
+    "MODEL-LATE-001",
+    "MODEL-EVENT-001"
+  ],
+  "runs_per_case": 1,
+  "records": [
+    {
+      "case_id": "MODEL-EVENT-002",
+      "run": 1,
+      "synthetic_case": true,
+      "model": "qwen2.5:3b",
+      "endpoint": "http://localhost:11434",
+      "prompt": {
+        "name": "event_exclusion",
+        "version": "focused-prompts-v1",
+        "length": 3892,
+        "sha256": "0ec0d18d5c0ae3041dd99d4968629723646f19497a4178b0f4656927a0eb73a4"
+      },
+      "expected": {
+        "event_type": "unknown",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "application_path": {
+        "success": true,
+        "envelope_type": "dict",
+        "envelope_keys": [
+          "parsed",
+          "parsing_error",
+          "raw"
+        ],
+        "raw_message": {
+          "type": "AIMessage",
+          "content": "{\n  \"event_type\": \"unknown\",\n  \"alcohol_or_drug_involvement\": \"unknown\",\n  \"illegal_racing\": \"unknown\",\n  \"intentional_damage\": \"unknown\",\n  \"outside_permitted_geographic_coverage\": \"unknown\"\n}",
+          "tool_calls": [],
+          "additional_kwargs": {},
+          "response_metadata": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-09-20T02:10:01.7203109Z",
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 8017857000,
+            "load_duration": 6188205700,
+            "prompt_eval_count": 915,
+            "prompt_eval_duration": 559768000,
+            "eval_count": 56,
+            "eval_duration": 1261248000,
+            "logprobs": null,
+            "model_name": "qwen2.5:3b",
+            "model_provider": "ollama"
+          },
+          "usage_metadata": {
+            "input_tokens": 915,
+            "output_tokens": 56,
+            "total_tokens": 971
+          }
+        },
+        "langchain_parsed": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "parsing_error": null,
+        "pydantic_validated": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "normalized_output": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "evaluator_actual": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "fallback_triggered": false,
+        "error": null,
+        "timeline_ms": {
+          "request_started": 0.0,
+          "provider_call_started": 28.579,
+          "provider_response_received": 10119.516,
+          "parse_finished": 10119.519,
+          "validation_finished": 10119.555
+        }
+      },
+      "direct_path": {
+        "success": true,
+        "response_envelope_keys": [
+          "created_at",
+          "done",
+          "done_reason",
+          "eval_count",
+          "eval_duration",
+          "load_duration",
+          "message",
+          "model",
+          "prompt_eval_cached_count",
+          "prompt_eval_count",
+          "prompt_eval_duration",
+          "total_duration"
+        ],
+        "raw_model_content": "{\n  \"event_type\": \"unknown\",\n  \"alcohol_or_drug_involvement\": \"unknown\",\n  \"illegal_racing\": \"unknown\",\n  \"intentional_damage\": \"unknown\",\n  \"outside_permitted_geographic_coverage\": \"unknown\"\n}",
+        "response_metadata": {
+          "model": "qwen2.5:3b",
+          "created_at": "2026-09-20T02:10:05.1145188Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 1351646500,
+          "load_duration": 4329600,
+          "prompt_eval_count": 915,
+          "prompt_eval_duration": 37240000,
+          "eval_count": 56,
+          "eval_duration": 1303087000
+        },
+        "json_dictionary": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "pydantic_validated": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "unknown",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "parse_error": null,
+        "validation_error": null,
+        "latency_ms": {
+          "provider": 3390.591,
+          "parse_validation": 0.191,
+          "total": 3390.782
+        }
+      },
+      "paths_use_same_prompt_hash": true,
+      "comparison_note": "Both paths use the same prompt, schema, model, and temperature. LangChain transport/adaptation is not guaranteed byte-identical to the direct Ollama request."
+    },
+    {
+      "case_id": "MODEL-RISK-001",
+      "run": 1,
+      "synthetic_case": true,
+      "model": "qwen2.5:3b",
+      "endpoint": "http://localhost:11434",
+      "prompt": {
+        "name": "history_risk",
+        "version": "focused-prompts-v1",
+        "length": 4049,
+        "sha256": "94dd5f0227cf7511baf67542bf9a8992fe30f6f7180fd9f71a347f36b788ade7"
+      },
+      "expected": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "true",
+        "severe_damage": "true",
+        "weak_evidence": "true"
+      },
+      "application_path": {
+        "success": true,
+        "envelope_type": "dict",
+        "envelope_keys": [
+          "parsed",
+          "parsing_error",
+          "raw"
+        ],
+        "raw_message": {
+          "type": "AIMessage",
+          "content": "{\n  \"suspicious_pattern\": \"unknown\",\n  \"inconsistent_story\": \"unknown\",\n  \"repeated_claims\": \"unknown\",\n  \"severe_damage\": \"unknown\",\n  \"weak_evidence\": \"unknown\"\n}",
+          "tool_calls": [],
+          "additional_kwargs": {},
+          "response_metadata": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-09-20T02:10:08.9574396Z",
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 1771638700,
+            "load_duration": 4147700,
+            "prompt_eval_count": 950,
+            "prompt_eval_duration": 648151000,
+            "eval_count": 50,
+            "eval_duration": 1099314000,
+            "logprobs": null,
+            "model_name": "qwen2.5:3b",
+            "model_provider": "ollama"
+          },
+          "usage_metadata": {
+            "input_tokens": 950,
+            "output_tokens": 50,
+            "total_tokens": 1000
+          }
+        },
+        "langchain_parsed": {
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "parsing_error": null,
+        "pydantic_validated": {
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "normalized_output": {
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "evaluator_actual": {
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "fallback_triggered": false,
+        "error": null,
+        "timeline_ms": {
+          "request_started": 0.0,
+          "provider_call_started": 24.042,
+          "provider_response_received": 3844.152,
+          "parse_finished": 3844.154,
+          "validation_finished": 3844.174
+        }
+      },
+      "direct_path": {
+        "success": true,
+        "response_envelope_keys": [
+          "created_at",
+          "done",
+          "done_reason",
+          "eval_count",
+          "eval_duration",
+          "load_duration",
+          "message",
+          "model",
+          "prompt_eval_cached_count",
+          "prompt_eval_count",
+          "prompt_eval_duration",
+          "total_duration"
+        ],
+        "raw_model_content": "{\n  \"suspicious_pattern\": \"unknown\",\n  \"inconsistent_story\": \"unknown\",\n  \"repeated_claims\": \"unknown\",\n  \"severe_damage\": \"unknown\",\n  \"weak_evidence\": \"unknown\"\n}",
+        "response_metadata": {
+          "model": "qwen2.5:3b",
+          "created_at": "2026-09-20T02:10:12.2555969Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 1247144100,
+          "load_duration": 4184200,
+          "prompt_eval_count": 950,
+          "prompt_eval_duration": 40153000,
+          "eval_count": 50,
+          "eval_duration": 1193432000
+        },
+        "json_dictionary": {
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "pydantic_validated": {
+          "suspicious_pattern": "unknown",
+          "inconsistent_story": "unknown",
+          "repeated_claims": "unknown",
+          "severe_damage": "unknown",
+          "weak_evidence": "unknown"
+        },
+        "parse_error": null,
+        "validation_error": null,
+        "latency_ms": {
+          "provider": 3295.284,
+          "parse_validation": 0.149,
+          "total": 3295.433
+        }
+      },
+      "paths_use_same_prompt_hash": true,
+      "comparison_note": "Both paths use the same prompt, schema, model, and temperature. LangChain transport/adaptation is not guaranteed byte-identical to the direct Ollama request."
+    },
+    {
+      "case_id": "MODEL-LATE-001",
+      "run": 1,
+      "synthetic_case": true,
+      "model": "qwen2.5:3b",
+      "endpoint": "http://localhost:11434",
+      "prompt": {
+        "name": "late_reason",
+        "version": "focused-prompts-v1",
+        "length": 3139,
+        "sha256": "4c556c7dcd514c67be3d7668d37fe7c5c388253681480764dfd0fa622527fd8d"
+      },
+      "expected": {
+        "late_submission_valid_reason": "true"
+      },
+      "application_path": {
+        "success": true,
+        "envelope_type": "dict",
+        "envelope_keys": [
+          "parsed",
+          "parsing_error",
+          "raw"
+        ],
+        "raw_message": {
+          "type": "AIMessage",
+          "content": "{\n  \"late_submission_valid_reason\": \"unknown\"\n}",
+          "tool_calls": [],
+          "additional_kwargs": {},
+          "response_metadata": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-09-20T02:10:15.1547777Z",
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 822191400,
+            "load_duration": 4030900,
+            "prompt_eval_count": 706,
+            "prompt_eval_duration": 529214000,
+            "eval_count": 13,
+            "eval_duration": 272132000,
+            "logprobs": null,
+            "model_name": "qwen2.5:3b",
+            "model_provider": "ollama"
+          },
+          "usage_metadata": {
+            "input_tokens": 706,
+            "output_tokens": 13,
+            "total_tokens": 719
+          }
+        },
+        "langchain_parsed": {
+          "late_submission_valid_reason": "unknown"
+        },
+        "parsing_error": null,
+        "pydantic_validated": {
+          "late_submission_valid_reason": "unknown"
+        },
+        "normalized_output": {
+          "late_submission_valid_reason": "unknown"
+        },
+        "evaluator_actual": {
+          "late_submission_valid_reason": "unknown"
+        },
+        "fallback_triggered": false,
+        "error": null,
+        "timeline_ms": {
+          "request_started": 0.0,
+          "provider_call_started": 23.774,
+          "provider_response_received": 2900.007,
+          "parse_finished": 2900.008,
+          "validation_finished": 2900.024
+        }
+      },
+      "direct_path": {
+        "success": true,
+        "response_envelope_keys": [
+          "created_at",
+          "done",
+          "done_reason",
+          "eval_count",
+          "eval_duration",
+          "load_duration",
+          "message",
+          "model",
+          "prompt_eval_cached_count",
+          "prompt_eval_count",
+          "prompt_eval_duration",
+          "total_duration"
+        ],
+        "raw_model_content": "{\n  \"late_submission_valid_reason\": \"unknown\"\n}",
+        "response_metadata": {
+          "model": "qwen2.5:3b",
+          "created_at": "2026-09-20T02:10:17.6197813Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 413558200,
+          "load_duration": 3921900,
+          "prompt_eval_count": 706,
+          "prompt_eval_duration": 42543000,
+          "eval_count": 13,
+          "eval_duration": 361306000
+        },
+        "json_dictionary": {
+          "late_submission_valid_reason": "unknown"
+        },
+        "pydantic_validated": {
+          "late_submission_valid_reason": "unknown"
+        },
+        "parse_error": null,
+        "validation_error": null,
+        "latency_ms": {
+          "provider": 2461.91,
+          "parse_validation": 0.167,
+          "total": 2462.077
+        }
+      },
+      "paths_use_same_prompt_hash": true,
+      "comparison_note": "Both paths use the same prompt, schema, model, and temperature. LangChain transport/adaptation is not guaranteed byte-identical to the direct Ollama request."
+    },
+    {
+      "case_id": "MODEL-EVENT-001",
+      "run": 1,
+      "synthetic_case": true,
+      "model": "qwen2.5:3b",
+      "endpoint": "http://localhost:11434",
+      "prompt": {
+        "name": "event_exclusion",
+        "version": "focused-prompts-v1",
+        "length": 3893,
+        "sha256": "f113c335b93a262ba78d7960ad09577130d6c541f134dbe685a373b6278d0af3"
+      },
+      "expected": {
+        "event_type": "accidental_collision",
+        "illegal_racing": "true",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "application_path": {
+        "success": true,
+        "envelope_type": "dict",
+        "envelope_keys": [
+          "parsed",
+          "parsing_error",
+          "raw"
+        ],
+        "raw_message": {
+          "type": "AIMessage",
+          "content": "{\n  \"event_type\": \"unknown\",\n  \"alcohol_or_drug_involvement\": \"unknown\",\n  \"illegal_racing\": \"true\",\n  \"intentional_damage\": \"unknown\",\n  \"outside_permitted_geographic_coverage\": \"unknown\"\n}",
+          "tool_calls": [],
+          "additional_kwargs": {},
+          "response_metadata": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-09-20T02:10:21.4266566Z",
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 1733117000,
+            "load_duration": 3735800,
+            "prompt_eval_count": 914,
+            "prompt_eval_duration": 466648000,
+            "eval_count": 56,
+            "eval_duration": 1239098000,
+            "logprobs": null,
+            "model_name": "qwen2.5:3b",
+            "model_provider": "ollama"
+          },
+          "usage_metadata": {
+            "input_tokens": 914,
+            "output_tokens": 56,
+            "total_tokens": 970
+          }
+        },
+        "langchain_parsed": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "parsing_error": null,
+        "pydantic_validated": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "normalized_output": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "evaluator_actual": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "fallback_triggered": false,
+        "error": null,
+        "timeline_ms": {
+          "request_started": 0.0,
+          "provider_call_started": 23.629,
+          "provider_response_received": 3808.199,
+          "parse_finished": 3808.2,
+          "validation_finished": 3808.216
+        }
+      },
+      "direct_path": {
+        "success": true,
+        "response_envelope_keys": [
+          "created_at",
+          "done",
+          "done_reason",
+          "eval_count",
+          "eval_duration",
+          "load_duration",
+          "message",
+          "model",
+          "prompt_eval_cached_count",
+          "prompt_eval_count",
+          "prompt_eval_duration",
+          "total_duration"
+        ],
+        "raw_model_content": "{\n  \"event_type\": \"unknown\",\n  \"alcohol_or_drug_involvement\": \"unknown\",\n  \"illegal_racing\": \"true\",\n  \"intentional_damage\": \"unknown\",\n  \"outside_permitted_geographic_coverage\": \"unknown\"\n}",
+        "response_metadata": {
+          "model": "qwen2.5:3b",
+          "created_at": "2026-09-20T02:10:24.8297572Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 1355997100,
+          "load_duration": 4110100,
+          "prompt_eval_count": 914,
+          "prompt_eval_duration": 44937000,
+          "eval_count": 56,
+          "eval_duration": 1299760000
+        },
+        "json_dictionary": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "pydantic_validated": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "parse_error": null,
+        "validation_error": null,
+        "latency_ms": {
+          "provider": 3399.798,
+          "parse_validation": 0.155,
+          "total": 3399.953
+        }
+      },
+      "paths_use_same_prompt_hash": true,
+      "comparison_note": "Both paths use the same prompt, schema, model, and temperature. LangChain transport/adaptation is not guaranteed byte-identical to the direct Ollama request."
+    }
+  ]
+}

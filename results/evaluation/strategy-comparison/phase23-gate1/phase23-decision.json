@@ -1,0 +1,26 @@
+{
+  "phase": "2.3",
+  "raw_artifact": "targeted-comparison.json",
+  "warmup": {
+    "status": "PROVIDER_TIMEOUT",
+    "attempts": 1,
+    "deadline_seconds": 30
+  },
+  "strategy_a": {
+    "successful_invocations": 0,
+    "total_invocations": 4,
+    "timeouts": 4,
+    "total_attempts": 8
+  },
+  "strategy_b": {
+    "successful_invocations": 0,
+    "total_invocations": 4,
+    "timeouts": 4,
+    "total_attempts": 8
+  },
+  "gate1": "INCONCLUSIVE",
+  "gate2": "SKIPPED_BY_GATE",
+  "final_strategy_decision": "INCONCLUSIVE",
+  "production_default": "current",
+  "reason": "No complete response was received from either strategy within the bounded deadline, so semantic quality and safety could not be compared."
+}

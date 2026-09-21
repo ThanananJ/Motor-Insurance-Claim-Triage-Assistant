@@ -1,0 +1,595 @@
+{
+  "created_at": "2026-09-20T02:58:27.539237+00:00",
+  "experimental": true,
+  "production_default": "current",
+  "warmup": {
+    "success": true,
+    "latency_ms": 10043.574,
+    "content": "{\"ready\": true}",
+    "excluded_from_comparison": true
+  },
+  "case_ids": [
+    "MODEL-EVENT-002",
+    "MODEL-RISK-001",
+    "MODEL-LATE-001",
+    "MODEL-EVENT-001"
+  ],
+  "strategy_order_control": "alternated by case",
+  "records": [
+    {
+      "case_id": "MODEL-EVENT-002",
+      "prompt_name": "event_exclusion",
+      "strategy": "current",
+      "expected": {
+        "event_type": "unknown",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3892,
+        "sha256": "0ec0d18d5c0ae3041dd99d4968629723646f19497a4178b0f4656927a0eb73a4"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62119.855,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-EVENT-002",
+      "prompt_name": "event_exclusion",
+      "strategy": "minimal-json",
+      "expected": {
+        "event_type": "unknown",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3892,
+        "sha256": "0ec0d18d5c0ae3041dd99d4968629723646f19497a4178b0f4656927a0eb73a4"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62096.487,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-RISK-001",
+      "prompt_name": "history_risk",
+      "strategy": "minimal-json",
+      "expected": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "true",
+        "severe_damage": "true",
+        "weak_evidence": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 4049,
+        "sha256": "94dd5f0227cf7511baf67542bf9a8992fe30f6f7180fd9f71a347f36b788ade7"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62092.177,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "suspicious_pattern": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "inconsistent_story": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "repeated_claims": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "severe_damage": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "weak_evidence": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-RISK-001",
+      "prompt_name": "history_risk",
+      "strategy": "current",
+      "expected": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "true",
+        "severe_damage": "true",
+        "weak_evidence": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 4049,
+        "sha256": "94dd5f0227cf7511baf67542bf9a8992fe30f6f7180fd9f71a347f36b788ade7"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62090.489,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "suspicious_pattern": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "inconsistent_story": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "repeated_claims": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "severe_damage": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "weak_evidence": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-LATE-001",
+      "prompt_name": "late_reason",
+      "strategy": "current",
+      "expected": {
+        "late_submission_valid_reason": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3139,
+        "sha256": "4c556c7dcd514c67be3d7668d37fe7c5c388253681480764dfd0fa622527fd8d"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62083.232,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "late_submission_valid_reason": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 1,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-LATE-001",
+      "prompt_name": "late_reason",
+      "strategy": "minimal-json",
+      "expected": {
+        "late_submission_valid_reason": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3139,
+        "sha256": "4c556c7dcd514c67be3d7668d37fe7c5c388253681480764dfd0fa622527fd8d"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62083.217,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "late_submission_valid_reason": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 1,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-EVENT-001",
+      "prompt_name": "event_exclusion",
+      "strategy": "minimal-json",
+      "expected": {
+        "event_type": "accidental_collision",
+        "illegal_racing": "true",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3893,
+        "sha256": "f113c335b93a262ba78d7960ad09577130d6c541f134dbe685a373b6278d0af3"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "ReadTimeout: timed out",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 62115.269,
+        "fallback_triggered": true
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "accidental_collision",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-EVENT-001",
+      "prompt_name": "event_exclusion",
+      "strategy": "current",
+      "expected": {
+        "event_type": "accidental_collision",
+        "illegal_racing": "true",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3893,
+        "sha256": "f113c335b93a262ba78d7960ad09577130d6c541f134dbe685a373b6278d0af3"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": true,
+        "raw": {
+          "type": "AIMessage",
+          "content": "{\n  \"event_type\": \"unknown\",\n  \"alcohol_or_drug_involvement\": \"unknown\",\n  \"illegal_racing\": \"true\",\n  \"intentional_damage\": \"unknown\",\n  \"outside_permitted_geographic_coverage\": \"unknown\"\n}",
+          "tool_calls": [],
+          "additional_kwargs": {},
+          "response_metadata": {
+            "model": "qwen2.5:3b",
+            "created_at": "2026-09-20T02:58:27.5321761Z",
+            "done": true,
+            "done_reason": "stop",
+            "total_duration": 228016027600,
+            "load_duration": 4049300,
+            "prompt_eval_count": 914,
+            "prompt_eval_duration": 390584000,
+            "eval_count": 56,
+            "eval_duration": 216152848000,
+            "logprobs": null,
+            "model_name": "qwen2.5:3b",
+            "model_provider": "ollama"
+          },
+          "usage_metadata": {
+            "input_tokens": 914,
+            "output_tokens": 56,
+            "total_tokens": 970
+          }
+        },
+        "json_valid": true,
+        "parsed": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "pydantic_valid": true,
+        "actual": {
+          "event_type": "unknown",
+          "alcohol_or_drug_involvement": "unknown",
+          "illegal_racing": "true",
+          "intentional_damage": "unknown",
+          "outside_permitted_geographic_coverage": "unknown"
+        },
+        "parsing_error": null,
+        "validation_error": null,
+        "latency_ms": 230112.87,
+        "fallback_triggered": false
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "accidental_collision",
+            "actual": "unknown",
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "true",
+            "actual": "true",
+            "correct": true
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": "unknown",
+            "correct": true
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": "unknown",
+            "correct": true
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": "unknown",
+            "correct": true
+          }
+        },
+        "correct": 4,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    }
+  ],
+  "gate1_decision": {
+    "status": "FAIL",
+    "checks": {
+      "risk_improved": false,
+      "late_not_worse": true,
+      "event_not_worse": false,
+      "control_no_unsupported_fact": true,
+      "unsupported_critical_facts_zero": true,
+      "json_and_pydantic_all_valid": false,
+      "no_final_decision_fields": true,
+      "no_safety_regression": true
+    },
+    "critical_correct_counts": {
+      "risk": {
+        "current": 0,
+        "minimal_json": 0,
+        "total": 3
+      },
+      "late": {
+        "current": 0,
+        "minimal_json": 0,
+        "total": 1
+      },
+      "event": {
+        "current": 1,
+        "minimal_json": 0,
+        "total": 2
+      }
+    },
+    "gate2": "SKIPPED_BY_GATE"
+  }
+}

@@ -1,0 +1,764 @@
+{
+  "created_at": "2026-09-20T05:32:54.374046+00:00",
+  "experimental": true,
+  "production_default": "current",
+  "warmup": {
+    "success": false,
+    "error": "PROVIDER_TIMEOUT",
+    "failure_category": "PROVIDER_TIMEOUT",
+    "json_valid": false,
+    "pydantic_valid": false,
+    "actual": null,
+    "latency_ms": 30030.857,
+    "deadline_ms": 30000.0,
+    "attempt_count": 1,
+    "retry_count": 0,
+    "attempts": [
+      {
+        "attempt": 1,
+        "status": "PROVIDER_TIMEOUT",
+        "latency_ms": 30030.857,
+        "error": "Total deadline exceeded (30.0s)"
+      }
+    ],
+    "fallback_triggered": true,
+    "output_token_count": null,
+    "excluded_from_comparison": true
+  },
+  "case_ids": [
+    "MODEL-EVENT-002",
+    "MODEL-RISK-001",
+    "MODEL-LATE-001",
+    "MODEL-EVENT-001"
+  ],
+  "strategy_order_control": "alternated by case; concurrency=1",
+  "records": [
+    {
+      "case_id": "MODEL-EVENT-002",
+      "prompt_name": "event_exclusion",
+      "strategy": "current",
+      "expected": {
+        "event_type": "unknown",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3892,
+        "sha256": "0ec0d18d5c0ae3041dd99d4968629723646f19497a4178b0f4656927a0eb73a4"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60374.894,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30187.082,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30187.812,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-EVENT-002",
+      "prompt_name": "event_exclusion",
+      "strategy": "minimal-json",
+      "expected": {
+        "event_type": "unknown",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3892,
+        "sha256": "0ec0d18d5c0ae3041dd99d4968629723646f19497a4178b0f4656927a0eb73a4"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60406.92,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30226.182,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30180.738,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-RISK-001",
+      "prompt_name": "history_risk",
+      "strategy": "minimal-json",
+      "expected": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "true",
+        "severe_damage": "true",
+        "weak_evidence": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 4049,
+        "sha256": "94dd5f0227cf7511baf67542bf9a8992fe30f6f7180fd9f71a347f36b788ade7"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60375.503,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30184.563,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30190.94,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "suspicious_pattern": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "inconsistent_story": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "repeated_claims": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "severe_damage": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "weak_evidence": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-RISK-001",
+      "prompt_name": "history_risk",
+      "strategy": "current",
+      "expected": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "true",
+        "severe_damage": "true",
+        "weak_evidence": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 4049,
+        "sha256": "94dd5f0227cf7511baf67542bf9a8992fe30f6f7180fd9f71a347f36b788ade7"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60407.788,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30201.27,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30206.518,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "suspicious_pattern": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "inconsistent_story": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "repeated_claims": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "severe_damage": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "weak_evidence": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-LATE-001",
+      "prompt_name": "late_reason",
+      "strategy": "current",
+      "expected": {
+        "late_submission_valid_reason": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3139,
+        "sha256": "4c556c7dcd514c67be3d7668d37fe7c5c388253681480764dfd0fa622527fd8d"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60352.358,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30177.479,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30174.879,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "late_submission_valid_reason": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 1,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-LATE-001",
+      "prompt_name": "late_reason",
+      "strategy": "minimal-json",
+      "expected": {
+        "late_submission_valid_reason": "true"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3139,
+        "sha256": "4c556c7dcd514c67be3d7668d37fe7c5c388253681480764dfd0fa622527fd8d"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60346.926999999996,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30170.998,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30175.929,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "late_submission_valid_reason": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 1,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-EVENT-001",
+      "prompt_name": "event_exclusion",
+      "strategy": "minimal-json",
+      "expected": {
+        "event_type": "accidental_collision",
+        "illegal_racing": "true",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3893,
+        "sha256": "f113c335b93a262ba78d7960ad09577130d6c541f134dbe685a373b6278d0af3"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60363.878,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30165.543,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30198.335,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "accidental_collision",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    },
+    {
+      "case_id": "MODEL-EVENT-001",
+      "prompt_name": "event_exclusion",
+      "strategy": "current",
+      "expected": {
+        "event_type": "accidental_collision",
+        "illegal_racing": "true",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "prompt_metadata": {
+        "version": "focused-prompts-v1",
+        "length": 3893,
+        "sha256": "f113c335b93a262ba78d7960ad09577130d6c541f134dbe685a373b6278d0af3"
+      },
+      "settings": {
+        "model": "qwen2.5:3b",
+        "endpoint": "http://localhost:11434",
+        "temperature": 0,
+        "seed": 42,
+        "context_size": null,
+        "num_predict": 256,
+        "keep_alive": "5m",
+        "total_deadline_seconds": 30.0,
+        "max_retries": 1,
+        "concurrency": 1,
+        "current_format": "json_schema",
+        "minimal_json_format": "json",
+        "determinism_guaranteed": false
+      },
+      "result": {
+        "success": false,
+        "error": "PROVIDER_TIMEOUT",
+        "failure_category": "PROVIDER_TIMEOUT",
+        "json_valid": false,
+        "pydantic_valid": false,
+        "actual": null,
+        "latency_ms": 60357.372,
+        "deadline_ms": 30000.0,
+        "attempt_count": 2,
+        "retry_count": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30191.518,
+            "error": "Total deadline exceeded (30.0s)"
+          },
+          {
+            "attempt": 2,
+            "status": "PROVIDER_TIMEOUT",
+            "latency_ms": 30165.854,
+            "error": "Total deadline exceeded (30.0s)"
+          }
+        ],
+        "fallback_triggered": true,
+        "output_token_count": null
+      },
+      "comparison": {
+        "fields": {
+          "event_type": {
+            "expected": "accidental_collision",
+            "actual": null,
+            "correct": false
+          },
+          "illegal_racing": {
+            "expected": "true",
+            "actual": null,
+            "correct": false
+          },
+          "alcohol_or_drug_involvement": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "intentional_damage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          },
+          "outside_permitted_geographic_coverage": {
+            "expected": "unknown",
+            "actual": null,
+            "correct": false
+          }
+        },
+        "correct": 0,
+        "total": 5,
+        "unsupported_fields": [],
+        "unsupported_critical_fields": []
+      }
+    }
+  ],
+  "gate1_decision": {
+    "status": "REJECTED_FOR_SAFETY",
+    "checks": {
+      "risk_improved": false,
+      "late_not_worse": true,
+      "event_not_worse": true,
+      "control_no_unsupported_fact": false,
+      "unsupported_critical_facts_zero": true,
+      "json_and_pydantic_all_valid": false,
+      "no_final_decision_fields": true,
+      "no_safety_regression": true
+    },
+    "critical_correct_counts": {
+      "risk": {
+        "current": 0,
+        "minimal_json": 0,
+        "total": 3
+      },
+      "late": {
+        "current": 0,
+        "minimal_json": 0,
+        "total": 1
+      },
+      "event": {
+        "current": 0,
+        "minimal_json": 0,
+        "total": 2
+      }
+    },
+    "gate2": "SKIPPED_BY_GATE"
+  }
+}

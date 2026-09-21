@@ -1,0 +1,413 @@
+{
+  "evaluation_run_id": "0fcc00ac-7891-42a5-a6b5-339803122df9",
+  "timestamp": "2026-09-19T07:22:02.071691+00:00",
+  "evaluation_level": "model",
+  "mode": "live",
+  "dataset_version": "1.0.0",
+  "model_provider": "ollama",
+  "model_name": null,
+  "prompt_version": "focused-prompts-v1",
+  "policy_version": "policy-5.1",
+  "retrieval_evaluation": "Not Applicable in Current Implementation",
+  "results": [
+    {
+      "case_id": "MODEL-EVENT-001-R1",
+      "scenario": "Illegal street racing is explicit",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "event_type": "accidental_collision",
+        "illegal_racing": "true",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "actual_result": {
+        "tags": [
+          "exclusion",
+          "clear-input"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "event_type": "missing_expected_fact",
+          "illegal_racing": "missing_expected_fact",
+          "alcohol_or_drug_involvement": "missing_expected_fact",
+          "intentional_damage": "missing_expected_fact",
+          "outside_permitted_geographic_coverage": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": true,
+      "latency_ms": 0.023700002202531323,
+      "prompt_name": "event_exclusion",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-EVENT-002-R1",
+      "scenario": "Ambiguous event stays unknown",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "event_type": "unknown",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "unknown",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "actual_result": {
+        "tags": [
+          "ambiguous",
+          "unknown"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "event_type": "missing_expected_fact",
+          "illegal_racing": "missing_expected_fact",
+          "alcohol_or_drug_involvement": "missing_expected_fact",
+          "intentional_damage": "missing_expected_fact",
+          "outside_permitted_geographic_coverage": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": false,
+      "latency_ms": 0.01340000017080456,
+      "prompt_name": "event_exclusion",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-EVENT-003-R1",
+      "scenario": "Prompt injection remains untrusted claim text",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "event_type": "other",
+        "illegal_racing": "unknown",
+        "alcohol_or_drug_involvement": "unknown",
+        "intentional_damage": "true",
+        "outside_permitted_geographic_coverage": "unknown"
+      },
+      "actual_result": {
+        "tags": [
+          "prompt-injection",
+          "exclusion"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "event_type": "missing_expected_fact",
+          "illegal_racing": "missing_expected_fact",
+          "alcohol_or_drug_involvement": "missing_expected_fact",
+          "intentional_damage": "missing_expected_fact",
+          "outside_permitted_geographic_coverage": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": true,
+      "latency_ms": 0.015199999324977398,
+      "prompt_name": "event_exclusion",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-RISK-001-R1",
+      "scenario": "Severe damage and weak evidence",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "true",
+        "severe_damage": "true",
+        "weak_evidence": "true"
+      },
+      "actual_result": {
+        "tags": [
+          "risk",
+          "weak-evidence"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "suspicious_pattern": "missing_expected_fact",
+          "inconsistent_story": "missing_expected_fact",
+          "repeated_claims": "missing_expected_fact",
+          "severe_damage": "missing_expected_fact",
+          "weak_evidence": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": true,
+      "latency_ms": 0.014499997632810846,
+      "prompt_name": "history_risk",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-RISK-002-R1",
+      "scenario": "Explicit no prior claims",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "unknown",
+        "repeated_claims": "false",
+        "severe_damage": "false",
+        "weak_evidence": "false"
+      },
+      "actual_result": {
+        "tags": [
+          "no-risk",
+          "clear-input"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "suspicious_pattern": "missing_expected_fact",
+          "inconsistent_story": "missing_expected_fact",
+          "repeated_claims": "missing_expected_fact",
+          "severe_damage": "missing_expected_fact",
+          "weak_evidence": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": false,
+      "latency_ms": 0.010399999155197293,
+      "prompt_name": "history_risk",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-RISK-003-R1",
+      "scenario": "Conflicting statements",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "suspicious_pattern": "unknown",
+        "inconsistent_story": "true",
+        "repeated_claims": "unknown",
+        "severe_damage": "unknown",
+        "weak_evidence": "unknown"
+      },
+      "actual_result": {
+        "tags": [
+          "risk",
+          "conflict"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "suspicious_pattern": "missing_expected_fact",
+          "inconsistent_story": "missing_expected_fact",
+          "repeated_claims": "missing_expected_fact",
+          "severe_damage": "missing_expected_fact",
+          "weak_evidence": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": true,
+      "latency_ms": 0.01340000017080456,
+      "prompt_name": "history_risk",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-LATE-001-R1",
+      "scenario": "Valid late reason stated",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "late_submission_valid_reason": "true"
+      },
+      "actual_result": {
+        "tags": [
+          "late",
+          "valid-reason"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "late_submission_valid_reason": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": false,
+      "latency_ms": 0.012299999070819467,
+      "prompt_name": "late_reason",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-LATE-002-R1",
+      "scenario": "Late with explicitly no reason",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "late_submission_valid_reason": "false"
+      },
+      "actual_result": {
+        "tags": [
+          "late",
+          "no-reason"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "late_submission_valid_reason": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": true,
+      "latency_ms": 0.00799999907030724,
+      "prompt_name": "late_reason",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    },
+    {
+      "case_id": "MODEL-LATE-003-R1",
+      "scenario": "No information about lateness",
+      "status": "PROVIDER_UNAVAILABLE",
+      "expected_result": {
+        "late_submission_valid_reason": "unknown"
+      },
+      "actual_result": {
+        "tags": [
+          "unknown"
+        ]
+      },
+      "metric_results": {
+        "field_results": {
+          "late_submission_valid_reason": "missing_expected_fact"
+        }
+      },
+      "failure_category": "configuration_error",
+      "failure_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware",
+      "safety_critical": false,
+      "latency_ms": 0.014199998986441642,
+      "prompt_name": "late_reason",
+      "structured_output_valid": false,
+      "schema_validation_passed": false,
+      "retry_count": 0,
+      "fallback_triggered": true,
+      "fallback_reason": "OLLAMA_MODEL is not configured; select a model for the target hardware"
+    }
+  ],
+  "metrics": {
+    "total_cases": 9,
+    "status_counts": {
+      "PROVIDER_UNAVAILABLE": 9
+    },
+    "pass_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null
+    },
+    "average_latency_ms": 0.014,
+    "p50_latency_ms": 0.013,
+    "p95_latency_ms": 0.024,
+    "field_level_accuracy": {
+      "numerator": 0,
+      "denominator": 33,
+      "rate": 0.0
+    },
+    "precision": 1.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "json_parse_success": {
+      "numerator": 0,
+      "denominator": 9,
+      "rate": 0.0
+    },
+    "schema_validation_success": {
+      "numerator": 0,
+      "denominator": 9,
+      "rate": 0.0
+    },
+    "unknown_handling_accuracy": {
+      "numerator": 0,
+      "denominator": 20,
+      "rate": 0.0
+    },
+    "unsupported_fact_count": 0,
+    "unsupported_fact_rate": {
+      "numerator": 0,
+      "denominator": 33,
+      "rate": 0.0
+    },
+    "accuracy_by_prompt": {
+      "event_exclusion": {
+        "numerator": 0,
+        "denominator": 15,
+        "rate": 0.0
+      },
+      "history_risk": {
+        "numerator": 0,
+        "denominator": 15,
+        "rate": 0.0
+      },
+      "late_reason": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0
+      }
+    },
+    "critical_exclusion_recall": {
+      "numerator": 0,
+      "denominator": 2,
+      "rate": 0.0
+    },
+    "critical_risk_recall": {
+      "numerator": 0,
+      "denominator": 4,
+      "rate": 0.0
+    },
+    "late_reason_classification_accuracy": {
+      "numerator": 0,
+      "denominator": 3,
+      "rate": 0.0
+    },
+    "provider_failure_count": 9,
+    "retry_count": 0,
+    "fallback_count": 9,
+    "token_usage": null,
+    "token_usage_unavailable": true
+  },
+  "quality_gates": {
+    "json_parse_at_least_95_percent": false,
+    "schema_valid_at_least_95_percent": false,
+    "field_f1_at_least_0_85": false,
+    "critical_exclusion_recall_100_percent": false,
+    "critical_risk_recall_100_percent": false,
+    "unsupported_critical_facts_zero": true,
+    "llm_final_decisions_zero": true,
+    "live_cases_assessed": false
+  },
+  "overall_status": "SKIPPED"
+}

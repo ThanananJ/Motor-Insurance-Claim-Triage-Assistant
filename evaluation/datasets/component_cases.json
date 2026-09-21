@@ -1,0 +1,15 @@
+{
+  "dataset_version": "1.0.0", "evaluation_level": "component",
+  "cases": [
+    {"case_id":"COMP-PROMPT-001","scenario":"Focused prompt contains policy, schema, and untrusted claim context","component":"prompt_builder","safety_critical":true},
+    {"case_id":"COMP-SCHEMA-001","scenario":"Valid focused payload passes strict schema","component":"schema_validation","safety_critical":true},
+    {"case_id":"COMP-SCHEMA-002","scenario":"Invalid enum fails schema validation","component":"invalid_schema","safety_critical":true},
+    {"case_id":"COMP-MERGE-001","scenario":"Disjoint focused outputs merge without changing values","component":"merge","safety_critical":true},
+    {"case_id":"COMP-RULE-001","scenario":"Explicit illegal racing routes rejection review","component":"coverage_routing","safety_critical":true},
+    {"case_id":"COMP-DOC-001","scenario":"Theft missing police report is detected","component":"documents","safety_critical":true},
+    {"case_id":"COMP-RISK-001","scenario":"Severe damage with weak evidence routes fraud review","component":"risk_routing","safety_critical":true},
+    {"case_id":"COMP-HUMAN-001","scenario":"Unconfirmed facts cannot cross workflow boundary","component":"human_boundary","safety_critical":true},
+    {"case_id":"COMP-FALLBACK-001","scenario":"Provider failure produces unknown advisory facts","component":"provider_fallback","safety_critical":true},
+    {"case_id":"COMP-EXPLAIN-001","scenario":"Explanation preserves deterministic recommendation disclaimer","component":"explanation","safety_critical":true}
+  ]
+}
