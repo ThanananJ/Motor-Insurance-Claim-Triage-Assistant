@@ -48,12 +48,12 @@ def _daily(events: list[dict], *, management: bool = False) -> list[list]:
 
 def technical_dashboard(
     repository: MonitoringRepository, start="", end="", environment="All", model="All",
-    prompt_version="All", status="All", error="All", data_source="All",
+    prompt_version="All", prompt_name="All", status="All", error="All", data_source="All",
 ):
     filters = MonitoringFilter(
         start_utc=_date(start), end_utc=_date(end, end=True), environment=environment,
         model_name=model, prompt_version=prompt_version, status=status,
-        error_category=error, synthetic=_synthetic(data_source),
+        prompt_name=prompt_name, error_category=error, synthetic=_synthetic(data_source),
     )
     events = repository.query(filters)
     metrics = summarize(events)
@@ -68,6 +68,34 @@ def technical_dashboard(
             f"Schema pass **{percent(metrics['schema_validity_rate'])}** · Fallback **{percent(metrics['fallback_rate'])}**  \n"
             f"Average latency **{metrics['average_latency_ms'] or 0:.1f} ms** · P95 **{metrics['p95_latency_ms'] or 0:.1f} ms** · UTC"
         )
+    token_percent = lambda value: "N/A" if value is None else f"{value:.2f}%"
+    token_cards = (
+        "### Prompt Token Capacity\n"
+        f"Average/claim **{metrics['average_prompt_tokens_per_claim'] or 0:,.1f}** · "
+        f"P95/claim **{metrics['p95_prompt_tokens_per_claim'] or 0:,.0f}** · "
+        f"Maximum prompt **{metrics['maximum_prompt_tokens_observed'] or 0:,}**  \n"
+        f"Average usage **{token_percent(metrics['average_context_usage_percent'])}** · "
+        f"Highest usage **{token_percent(metrics['highest_context_usage_percent'])}** · "
+        f"Warning/Critical/Over-limit **{metrics['context_status_distribution'].get('WARNING', 0)}/"
+        f"{metrics['context_status_distribution'].get('CRITICAL', 0)}/"
+        f"{metrics['context_status_distribution'].get('OVER_LIMIT', 0)}** · "
+        f"Unavailable **{token_percent(None if metrics['token_count_unavailable_rate'] is None else metrics['token_count_unavailable_rate'] * 100)}**"
+    )
+    prepared = [event for event in events if event["event_type"] == "LLM_PROMPT_PREPARED"]
+    prompt_rows = [
+        [
+            event["prompt_name"],
+            f"{event['prompt_token_count']:,} / {event['max_prompt_tokens']:,}" if event.get("prompt_token_count") is not None and event.get("max_prompt_tokens") else "Unavailable",
+            event.get("prompt_token_count"), event.get("max_prompt_tokens"),
+            round(event["context_usage_percent"], 2) if event.get("context_usage_percent") is not None else None,
+            event.get("remaining_prompt_capacity_tokens"), event.get("context_status") or "UNKNOWN",
+        ]
+        for event in prepared
+    ][-30:]
+    token_trend = [
+        [event["timestamp_utc"], event["prompt_name"], event.get("prompt_token_count"), event.get("context_usage_percent")]
+        for event in prepared
+    ][-100:]
     recent_failed = [
         [event["timestamp_utc"], event["request_id"], event["provider_error_category"] or event["validation_error_category"]]
         for event in events if event["event_type"] in {"AI_EXTRACTION_FAILED", "REQUEST_FAILED"}
@@ -81,7 +109,7 @@ def technical_dashboard(
         + [["Validation failure", *row] for row in _rows(metrics["validation_failure_distribution"])]
         + [["Fallback reason", *row] for row in _rows(metrics["fallback_reason_distribution"])]
     )
-    return cards, _daily(events), recent_failed, distributions, [[*key, value] for key, value in sorted(versions.items())]
+    return cards, token_cards, prompt_rows, token_trend, _daily(events), recent_failed, distributions, [[*key, value] for key, value in sorted(versions.items())]
 
 
 def management_dashboard(

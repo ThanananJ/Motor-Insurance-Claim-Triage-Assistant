@@ -15,6 +15,9 @@ class EventType(str, Enum):
     AI_EXTRACTION_STARTED = "AI_EXTRACTION_STARTED"
     AI_EXTRACTION_COMPLETED = "AI_EXTRACTION_COMPLETED"
     AI_EXTRACTION_FAILED = "AI_EXTRACTION_FAILED"
+    LLM_PROMPT_PREPARED = "LLM_PROMPT_PREPARED"
+    LLM_PROMPT_COMPLETED = "LLM_PROMPT_COMPLETED"
+    LLM_PROMPT_FAILED = "LLM_PROMPT_FAILED"
     SCHEMA_VALIDATION_COMPLETED = "SCHEMA_VALIDATION_COMPLETED"
     FALLBACK_TRIGGERED = "FALLBACK_TRIGGERED"
     HUMAN_CONFIRMATION_COMPLETED = "HUMAN_CONFIRMATION_COMPLETED"
@@ -55,6 +58,21 @@ class MonitoringEvent(BaseModel):
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
     token_usage_available: bool = False
+    prompt_name: str | None = None
+    tokenizer_name: str | None = None
+    token_count_source: str | None = None
+    token_count_available: bool = False
+    prompt_token_count: int | None = Field(default=None, ge=0)
+    token_count_error_category: str | None = None
+    model_capability_context_tokens: int | None = Field(default=None, ge=1)
+    effective_context_window_tokens: int | None = Field(default=None, ge=1)
+    reserved_output_tokens: int | None = Field(default=None, ge=0)
+    max_prompt_tokens: int | None = Field(default=None, ge=1)
+    remaining_prompt_capacity_tokens: int | None = None
+    context_usage_percent: float | None = Field(default=None, ge=0)
+    context_status: Literal["HEALTHY", "WARNING", "CRITICAL", "OVER_LIMIT", "UNKNOWN"] | None = None
+    over_prompt_limit: bool | None = None
+    context_source: str | None = None
     claim_scenario_category: str | None = None
     ai_facts_proposed_count: int | None = Field(default=None, ge=0)
     ai_unknown_count: int | None = Field(default=None, ge=0)
@@ -88,6 +106,7 @@ class MonitoringFilter(BaseModel):
     environment: str | None = None
     model_name: str | None = None
     prompt_version: str | None = None
+    prompt_name: str | None = None
     status: str | None = None
     error_category: str | None = None
     scenario_category: str | None = None

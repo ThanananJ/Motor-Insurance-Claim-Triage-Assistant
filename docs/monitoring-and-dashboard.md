@@ -11,6 +11,19 @@ Claim runtime workflow
   → read-only Technical / Management Gradio dashboards
 ```
 
+Prompt preflight runs before every focused provider attempt:
+
+```text
+Assemble focused prompt
+  → apply Qwen chat template
+  → count tokens
+  → calculate capacity/status
+  → persist allow-listed numeric/category telemetry
+  → call Ollama (unless OVER_LIMIT)
+```
+
+The tokenizer is `Qwen/Qwen2.5-3B-Instruct`, loaded lazily through Transformers and cached. The model capability is 131,072 total context tokens, but operational decisions use the effective application/Ollama runtime context. The current configured default is `OLLAMA_NUM_CTX=32768`, with 256 reserved output tokens, so `max_prompt_tokens=32512`; `context_source` is `application_num_ctx`.
+
 Each session receives a random UUID `request_id`. UTC events cover request
 start/completion/failure, extraction start/completion/failure, schema
 validation, fallback, human confirmation/override, deterministic triage, and
@@ -22,7 +35,8 @@ the current unavailable human-final-decision state. Monitoring is attached to
 Storage is limited to UUIDs, UTC timestamps, versions, status/error categories,
 latency, validation/fallback/retry/token availability fields, category/count
 business indicators, route and coverage result, and human confirmation/override
-metadata. Token counts remain null unless the provider actually supplies them.
+metadata. Prompt input counts come from the Qwen chat-template preflight;
+provider output-token counts remain null unless the provider supplies them.
 
 The schema rejects unknown fields. It never stores raw claim text, full prompts,
 raw model output, names, contact details, identity/vehicle/policy/claim numbers,
@@ -31,13 +45,19 @@ reasons are restricted to `AI_MISSED_FACT`, `AI_UNSUPPORTED_FACT`,
 `AMBIGUOUS_INPUT`, `NEW_EVIDENCE`, `OFFICER_JUDGMENT`, `PROVIDER_FAILURE`, or
 `OTHER_WITHOUT_FREE_TEXT`.
 
+Token events store only prompt name/version, model/tokenizer identifiers, count source, token counts, model capability, effective context, reserved output, maximum prompt capacity, remaining capacity, usage percent, status, over-limit flag, provider status, and latency. They never store the prompt, Policy text, schema text, claim content, or raw response. Counts are available before provider timeout, unavailability, parsing, or validation failure.
+
 ## Technical dashboard
 
 The overview shows requests, completion/failure, provider success/errors,
 schema pass, fallback, average/P95 latency, and health. Tables show recent
 category-only failures, error/validation/fallback distributions, and model /
 prompt / policy versions. Filters cover UTC dates, environment, model, prompt,
-status, error category, and synthetic/runtime source.
+status, error category, and synthetic/runtime source. Prompt-token cards show average/P95 per claim, maximum prompt observed, average/highest usage, warning/critical/over-limit counts, and unavailable rate. A per-prompt table displays `Input Prompt Tokens / Max Prompt Tokens`, usage, remaining capacity, and status; a compact trend shows prompt tokens and context usage over time. Prompt name is an additional filter.
+
+Prompt capacity status uses centralized configuration: below 70% is `HEALTHY`, 70–<85% is `WARNING`, 85–100% is `CRITICAL`, above 100% is `OVER_LIMIT`, and unavailable tokenizer/config is `UNKNOWN`. Percentages use maximum prompt tokens, not the 128K model capability.
+
+An `OVER_LIMIT` prompt is never sent to Ollama and is never silently truncated. The focused group returns safe `UNKNOWN` facts for human entry/confirmation, preserving deterministic triage after the human trust boundary. Tokenizer or monitoring failure remains fail-open.
 
 ## Management dashboard
 
@@ -71,6 +91,8 @@ prototype configuration, not fixed business standards.
 timeout, schema failure, fallback, override, all review routes, and missing-
 document examples. Synthetic rows are labelled and filterable. Nothing seeds on
 app startup. The database is `data/runtime_monitoring.db` and is Git-ignored.
+The seed also includes three per-prompt token rows for healthy, warning,
+critical, over-limit, and tokenizer-unavailable scenarios.
 
 Monitoring failure is fail-open: it logs only an exception category and does
 not stop extraction, human confirmation, or deterministic triage.
@@ -83,3 +105,7 @@ no alerts, and no retention/backup policy. A production version should add
 centralized encrypted storage, access controls, retention/deletion policy,
 multi-process correlation, immutable audit governance, and separately governed
 label-based accuracy reporting.
+
+Tokenizer files must be downloaded/cached separately on a network-enabled
+machine. If unavailable, the dashboard truthfully shows null/`UNKNOWN`; it does
+not substitute word, character, GPT-tokenizer, or heuristic estimates.

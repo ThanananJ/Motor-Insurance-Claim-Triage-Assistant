@@ -124,8 +124,8 @@ UNKNOWN, not FALSE. Explicit evidence must not remain UNKNOWN.
 class P18ABExtractor(FocusedClaimExtractor):
     """Focused extractor with controlled P1.8 prompt variants."""
 
-    def __init__(self, provider: LLMProvider, policy_retriever: PolicyRetriever, configuration: ABConfiguration) -> None:
-        super().__init__(provider, policy_retriever)
+    def __init__(self, provider: LLMProvider, policy_retriever: PolicyRetriever, configuration: ABConfiguration, **kwargs) -> None:
+        super().__init__(provider, policy_retriever, **kwargs)
         self.configuration = configuration
 
     def prompts_for(self, claim: ClaimInput) -> dict[str, str]:

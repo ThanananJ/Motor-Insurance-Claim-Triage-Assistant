@@ -44,6 +44,8 @@ def provider_with_chat(chat: FakeChatModel) -> OllamaProvider:
     def factory(**kwargs):
         assert kwargs["model"] == "configured-model"
         assert kwargs["temperature"] == 0
+        assert kwargs["num_ctx"] == 32768
+        assert kwargs["num_predict"] == 256
         return chat
 
     return OllamaProvider(

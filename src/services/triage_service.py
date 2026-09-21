@@ -43,6 +43,9 @@ class TriageService:
 
     def prepare_claim(self, claim: ClaimInput) -> HumanReviewPayload:
         request_id = self._monitoring.new_request_id() if self._monitoring else ""
+        set_context = getattr(self._extractor, "set_monitoring_context", None)
+        if callable(set_context):
+            set_context(request_id)
         started = perf_counter()
         self._record(MonitoringEventType.REQUEST_STARTED, request_id, status="started", stage="request")
         self._record(MonitoringEventType.AI_EXTRACTION_STARTED, request_id, status="started", stage="ai_extraction")
@@ -58,6 +61,16 @@ class TriageService:
                 provider=getattr(extraction, "provider", None),
                 model=getattr(extraction, "model", None),
                 failed_groups=list(getattr(extraction, "failed_groups", [])),
+                warning=(
+                    "Prompt exceeds configured context. Safe UNKNOWN suggestions were loaded; "
+                    "review, enter, and confirm facts manually."
+                    if any(getattr(group, "error_code", None) == "prompt_context_over_limit" for group in getattr(extraction, "groups", []))
+                    else (
+                        "LLM suggestions are advisory and require human confirmation."
+                        if success
+                        else "AI extraction unavailable. Safe UNKNOWN suggestions were loaded; please review, enter, and confirm facts manually."
+                    )
+                ),
             )
             latency_ms = (perf_counter() - started) * 1000
             self._record(
@@ -80,6 +93,7 @@ class TriageService:
                 source="safe_fallback",
                 extraction_success=False,
                 failed_groups=["semantic_extraction"],
+                warning="AI extraction unavailable. Safe UNKNOWN suggestions were loaded; please review, enter, and confirm facts manually.",
             )
             self._record(
                 MonitoringEventType.AI_EXTRACTION_FAILED, request_id, status="failed",

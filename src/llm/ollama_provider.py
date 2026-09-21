@@ -43,6 +43,8 @@ class OllamaProvider:
             model=model,
             base_url=config.ollama_base_url,
             temperature=0,
+            num_ctx=config.ollama_num_ctx,
+            num_predict=config.reserved_output_tokens,
             validate_model_on_init=False,
             client_kwargs={"timeout": config.ollama_timeout_seconds},
         )

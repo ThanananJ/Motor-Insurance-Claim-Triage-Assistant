@@ -15,6 +15,7 @@ from src.llm.ollama_provider import OllamaProvider
 from src.monitoring.dashboard import management_dashboard, technical_dashboard
 from src.monitoring.repository import MonitoringRepository
 from src.monitoring.service import MonitoringService
+from src.monitoring.prompt_tokens import PromptTokenCounter
 from src.policy.retriever import ExactPolicyRetriever
 from src.schemas import ClaimFacts, ClaimInput, ConfirmedClaimFacts, EventType, FactStatus
 from src.services.p1_8_ab_extractor import ABConfiguration, P18ABExtractor
@@ -52,6 +53,13 @@ load_local_env()
 class RuntimeSemanticExtractor:
     """Build the configured advisory Ollama extractor only when requested."""
 
+    def __init__(self, monitoring_service: MonitoringService) -> None:
+        self._monitoring = monitoring_service
+        self._request_id = ""
+
+    def set_monitoring_context(self, request_id: str) -> None:
+        self._request_id = request_id
+
     def extract(self, claim: ClaimInput):
         config = AppConfig.from_env()
         if config.ollama_model and config.ollama_model.casefold().startswith("qwen3"):
@@ -61,12 +69,17 @@ class RuntimeSemanticExtractor:
             )
         else:
             provider = OllamaProvider(config)
-        return P18ABExtractor(provider, ExactPolicyRetriever(), ABConfiguration.C).extract(claim)
+        extractor = P18ABExtractor(
+            provider, ExactPolicyRetriever(), ABConfiguration.C,
+            token_counter=PromptTokenCounter(config), monitoring_service=self._monitoring,
+        )
+        extractor.set_monitoring_context(self._request_id)
+        return extractor.extract(claim)
 
 
 MONITORING_REPOSITORY = MonitoringRepository(ROOT / "data" / "runtime_monitoring.db")
 MONITORING_SERVICE = MonitoringService(MONITORING_REPOSITORY)
-TRIAGE_SERVICE = TriageService(RuntimeSemanticExtractor(), monitoring_service=MONITORING_SERVICE)
+TRIAGE_SERVICE = TriageService(RuntimeSemanticExtractor(MONITORING_SERVICE), monitoring_service=MONITORING_SERVICE)
 
 
 def optional_date(value: str | None) -> date | None:
@@ -133,7 +146,7 @@ def prepare_with_service(service: TriageService, *values):
         f"AI proposal ready — provider: {review.proposal.provider or 'unknown'}, "
         f"model: {review.proposal.model or 'unknown'}. Review every value before confirming."
         if review.proposal.extraction_success
-        else "AI extraction unavailable. Safe UNKNOWN suggestions were loaded; please review, enter, and confirm facts manually."
+        else review.proposal.warning
     )
     return (review, status, *[getattr(facts, field).value for field in FACT_FIELDS], False)
 
@@ -264,19 +277,23 @@ def build_demo() -> gr.Blocks:
                     tech_model = gr.Dropdown(["All", "qwen2.5:3b"], value="All", label="Model")
                 with gr.Row():
                     tech_prompt = gr.Dropdown(["All", "focused-v1"], value="All", label="Prompt version")
+                    tech_prompt_name = gr.Dropdown(["All", "focused-event-exclusion", "focused-history-risk", "focused-late-reason"], value="All", label="Prompt name")
                     tech_status = gr.Dropdown(["All", "started", "success", "failed", "completed", "safe_fallback"], value="All", label="Status")
                     tech_error = gr.Dropdown(["All", "PROVIDER_TIMEOUT", "PROVIDER_FAILURE", "PROVIDER_OR_VALIDATION_FAILURE"], value="All", label="Error category")
                     tech_source = gr.Dropdown(["All", "Runtime only", "Synthetic only"], value="All", label="Data source")
                 tech_refresh = gr.Button("Refresh Technical Dashboard")
                 tech_cards = gr.Markdown("### Health: NO_DATA")
+                tech_token_cards = gr.Markdown("### Prompt Token Capacity\nNo token data.")
+                tech_prompt_tokens = gr.Dataframe(headers=["Prompt", "Input Prompt Tokens / Max Prompt Tokens", "Input", "Max", "Usage %", "Remaining", "Status"], label="Input Prompt Tokens / Max Prompt Tokens", interactive=False)
+                tech_token_trend = gr.Dataframe(headers=["Timestamp UTC", "Prompt", "Input Prompt Tokens", "Context usage %"], label="Prompt tokens by focused prompt / context usage trend", interactive=False)
                 tech_trends = gr.Dataframe(headers=["Date UTC", "Requests", "Provider success", "Failures", "Fallbacks", "Average latency ms"], label="Requests / provider / latency trend", interactive=False)
                 tech_failed = gr.Dataframe(headers=["Timestamp UTC", "Request ID", "Category"], label="Recent failures", interactive=False)
                 tech_distributions = gr.Dataframe(headers=["Metric", "Category", "Count"], label="Error / validation / fallback distributions", interactive=False)
                 tech_versions = gr.Dataframe(headers=["Model", "Prompt", "Policy", "Count"], label="Version breakdown", interactive=False)
                 tech_refresh.click(
                     lambda *args: technical_dashboard(MONITORING_REPOSITORY, *args),
-                    [tech_start, tech_end, tech_environment, tech_model, tech_prompt, tech_status, tech_error, tech_source],
-                    [tech_cards, tech_trends, tech_failed, tech_distributions, tech_versions],
+                    [tech_start, tech_end, tech_environment, tech_model, tech_prompt, tech_prompt_name, tech_status, tech_error, tech_source],
+                    [tech_cards, tech_token_cards, tech_prompt_tokens, tech_token_trend, tech_trends, tech_failed, tech_distributions, tech_versions],
                 )
             with gr.Tab("Management Dashboard"):
                 gr.Markdown(

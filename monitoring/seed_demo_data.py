@@ -17,6 +17,15 @@ SCENARIOS = [
     ("rejection_review", True, None, "Rejection review", "Not covered", False, False, 0, 1),
 ]
 
+PROMPTS = ("focused-event-exclusion", "focused-history-risk", "focused-late-reason")
+TOKEN_CASES = (
+    ("HEALTHY", 920),
+    ("WARNING", 24000),
+    ("CRITICAL", 29000),
+    ("OVER_LIMIT", 33000),
+    ("UNKNOWN", None),
+)
+
 
 def seed() -> int:
     service = MonitoringService()
@@ -27,6 +36,29 @@ def seed() -> int:
         common = {"is_synthetic": True, "claim_scenario_category": scenario, "timestamp_utc": now - timedelta(hours=index)}
         count += service.record(EventType.REQUEST_STARTED, request_id, status="started", stage="request", **common)
         count += service.record(EventType.AI_EXTRACTION_STARTED, request_id, status="started", stage="ai_extraction", **common)
+        context_status, base_tokens = TOKEN_CASES[index]
+        for prompt_index, prompt_name in enumerate(PROMPTS):
+            prompt_tokens = None if base_tokens is None else base_tokens + prompt_index * 25
+            maximum = 32512
+            count += service.record(
+                EventType.LLM_PROMPT_PREPARED, request_id,
+                status=context_status, stage="prompt_preflight", prompt_name=prompt_name,
+                model_provider="ollama", model_name="qwen2.5:3b",
+                tokenizer_name="Qwen/Qwen2.5-3B-Instruct",
+                token_count_source="qwen_chat_template",
+                token_count_available=prompt_tokens is not None,
+                prompt_token_count=prompt_tokens,
+                token_count_error_category=None if prompt_tokens is not None else "TOKENIZER_UNAVAILABLE",
+                model_capability_context_tokens=131072,
+                effective_context_window_tokens=32768,
+                reserved_output_tokens=256,
+                max_prompt_tokens=maximum,
+                remaining_prompt_capacity_tokens=None if prompt_tokens is None else maximum - prompt_tokens,
+                context_usage_percent=None if prompt_tokens is None else prompt_tokens / maximum * 100,
+                context_status=context_status,
+                over_prompt_limit=None if prompt_tokens is None else prompt_tokens > maximum,
+                context_source="application_num_ctx", provider_status="not_called", **common,
+            )
         count += service.record(
             EventType.AI_EXTRACTION_COMPLETED if success else EventType.AI_EXTRACTION_FAILED,
             request_id, status="success" if success else "failed", stage="ai_extraction",

@@ -58,6 +58,10 @@ LLM_PROVIDER=ollama
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_TIMEOUT_SECONDS=60
 OLLAMA_MODEL=qwen2.5:3b
+OLLAMA_NUM_CTX=32768
+OLLAMA_RESERVED_OUTPUT_TOKENS=256
+PROMPT_TOKEN_WARNING_PERCENT=70
+PROMPT_TOKEN_CRITICAL_PERCENT=85
 ```
 
 Do not put secrets in committed files. The same values can be set for the current PowerShell session:
@@ -67,6 +71,10 @@ $env:LLM_PROVIDER="ollama"
 $env:OLLAMA_BASE_URL="http://localhost:11434"
 $env:OLLAMA_TIMEOUT_SECONDS="60"
 $env:OLLAMA_MODEL="qwen2.5:3b"
+$env:OLLAMA_NUM_CTX="32768"
+$env:OLLAMA_RESERVED_OUTPUT_TOKENS="256"
+$env:PROMPT_TOKEN_WARNING_PERCENT="70"
+$env:PROMPT_TOKEN_CRITICAL_PERCENT="85"
 ```
 
 ## Ollama Setup
@@ -187,6 +195,30 @@ The application automatically creates `data/runtime_monitoring.db` when monitori
 
 Monitoring stores only allow-listed categories, counts, status, UUID correlation, UTC timestamps, versions, route/coverage outputs, and latency/validation/fallback metadata. It does not store raw claims, full prompts, raw model responses, names, contact details, vehicle/policy/claim identifiers, secrets, PII, or human free-text notes.
 
+### Prompt Token Monitoring
+
+Before each Ollama call, the application counts the fully assembled focused prompt—focused/system instructions, injected Policy context, output schema, claim input, and Qwen chat-template overhead—using the `Qwen/Qwen2.5-3B-Instruct` tokenizer. It counts event/exclusion, history/risk, and late-reason prompts separately; it never counts only the template file.
+
+Qwen2.5-3B-Instruct documents a model capability of approximately 128K total context (131,072 tokens) and up to approximately 8K output tokens. Those are model capabilities, not the application's runtime allowance. The dashboard uses the configured effective runtime context (`OLLAMA_NUM_CTX`, default 32,768), never 128K, as its operational denominator:
+
+```text
+max_prompt_tokens = effective_context_window - reserved_output_tokens
+context_usage_percent = input_prompt_tokens / max_prompt_tokens * 100
+
+Input Prompt Tokens / Max Prompt Tokens
+845 / 32,512
+```
+
+The default reserved output is 256 tokens, producing 32,512 maximum prompt tokens. Status is `HEALTHY` below 70%, `WARNING` from 70% to below 85%, `CRITICAL` from 85% through 100%, and `OVER_LIMIT` above 100%. Thresholds are configured once through the environment settings above.
+
+The tokenizer is loaded lazily and cached by Transformers/Hugging Face; it is not reloaded for every prompt. Pre-cache it during setup on a network-enabled machine:
+
+```powershell
+uv run python -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('Qwen/Qwen2.5-3B-Instruct')"
+```
+
+Normal tests use fakes and remain offline. If the tokenizer cannot load, monitoring records `TOKENIZER_UNAVAILABLE`, a null count, and `UNKNOWN`; the claim workflow continues. If a prompt exceeds the configured maximum, it is not sent to Ollama: the application records `OVER_LIMIT`, returns safe `UNKNOWN` proposed facts, and requires the Claim Officer to enter/review and confirm facts before deterministic triage. Prompts are never silently truncated, and raw prompts, Policy, schemas, claims, model responses, and PII are never persisted.
+
 ### Seed and Clear Synthetic Demo Data
 
 Seed labelled synthetic events explicitly (the app never seeds on startup):
@@ -210,7 +242,7 @@ Do not delete the database file or use broad SQL deletion as the normal cleanup 
 3. Choose Synthetic, Runtime, or All data; set UTC date, environment, model, prompt, status, and error filters.
 4. Select **Refresh Technical Dashboard**.
 
-It shows total requests, completed/failed workflow, provider success/errors, schema pass rate, fallback rate, average/P95 latency, error/fallback distributions, version breakdown, and health.
+It shows total requests, completed/failed workflow, provider success/errors, schema pass rate, fallback rate, average/P95 latency, error/fallback distributions, version breakdown, health, prompt-token capacity cards, a per-focused-prompt `Input Prompt Tokens / Max Prompt Tokens` table, and context-usage trend. Existing filters also apply to token data, with an additional prompt-name filter.
 
 Health is `HEALTHY`, `WARNING`, `CRITICAL`, or `NO_DATA`. Initial operational thresholds are:
 

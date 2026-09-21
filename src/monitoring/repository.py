@@ -41,6 +41,19 @@ class MonitoringRepository:
                     human_final_decision_category TEXT
                 )
             """)
+            existing = {row[1] for row in connection.execute("PRAGMA table_info(monitoring_events)")}
+            migrations = {
+                "prompt_name": "TEXT", "tokenizer_name": "TEXT", "token_count_source": "TEXT",
+                "token_count_available": "INTEGER NOT NULL DEFAULT 0", "prompt_token_count": "INTEGER",
+                "token_count_error_category": "TEXT", "model_capability_context_tokens": "INTEGER",
+                "effective_context_window_tokens": "INTEGER", "reserved_output_tokens": "INTEGER",
+                "max_prompt_tokens": "INTEGER", "remaining_prompt_capacity_tokens": "INTEGER",
+                "context_usage_percent": "REAL", "context_status": "TEXT",
+                "over_prompt_limit": "INTEGER", "context_source": "TEXT",
+            }
+            for column, definition in migrations.items():
+                if column not in existing:
+                    connection.execute(f"ALTER TABLE monitoring_events ADD COLUMN {column} {definition}")
             connection.execute("CREATE INDEX IF NOT EXISTS idx_monitoring_request ON monitoring_events(request_id)")
             connection.execute("CREATE INDEX IF NOT EXISTS idx_monitoring_time ON monitoring_events(timestamp_utc)")
 
@@ -60,6 +73,7 @@ class MonitoringRepository:
         mapping = {
             "environment": filters.environment, "model_name": filters.model_name,
             "prompt_version": filters.prompt_version, "status": filters.status,
+            "prompt_name": filters.prompt_name,
             "provider_error_category": filters.error_category,
             "claim_scenario_category": filters.scenario_category,
             "route": filters.route, "coverage_status": filters.coverage_status,

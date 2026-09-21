@@ -10,6 +10,9 @@ from typing import Any, TypeVar
 from pydantic import BaseModel, ValidationError
 
 from src.llm.base import LLMProvider, LLMProviderError, LLMStructuredOutputError
+from src.monitoring.models import EventType as MonitoringEventType
+from src.monitoring.prompt_tokens import PromptTokenCounter
+from src.monitoring.service import MonitoringService
 from src.policy.retriever import PolicyRetriever
 from src.schemas import (
     ClaimFacts,
@@ -54,9 +57,15 @@ def build_focused_prompt(
 class FocusedClaimExtractor:
     """Run three bounded semantic tasks and compose their disjoint validated fields."""
 
-    def __init__(self, provider: LLMProvider, policy_retriever: PolicyRetriever) -> None:
+    def __init__(self, provider: LLMProvider, policy_retriever: PolicyRetriever, *, token_counter: PromptTokenCounter | None = None, monitoring_service: MonitoringService | None = None) -> None:
         self._provider = provider
         self._policy_retriever = policy_retriever
+        self._token_counter = token_counter
+        self._monitoring = monitoring_service
+        self._request_id = ""
+
+    def set_monitoring_context(self, request_id: str) -> None:
+        self._request_id = request_id
 
     def extract(self, claim: ClaimInput) -> FocusedSemanticExtractionResult:
         provider_name = getattr(self._provider, "provider_name", None)
@@ -149,9 +158,25 @@ class FocusedClaimExtractor:
         started = time.perf_counter()
         retry_count = 0
         while True:
+            preflight = self._token_counter.count(prompt) if self._token_counter else None
+            token_fields = preflight.monitoring_fields() if preflight else {
+                "token_count_available": False,
+                "token_count_error_category": "TOKENIZER_UNAVAILABLE",
+                "context_status": "UNKNOWN",
+            }
+            self._record_prompt(MonitoringEventType.LLM_PROMPT_PREPARED, name, status=preflight.context_status if preflight else "UNKNOWN", provider_status="not_called", retry_count=retry_count, **token_fields)
+            if preflight and preflight.over_prompt_limit:
+                self._record_prompt(MonitoringEventType.LLM_PROMPT_FAILED, name, status="OVER_LIMIT", provider_status="not_called", fallback_triggered=True, fallback_reason="PROMPT_CONTEXT_OVER_LIMIT", retry_count=retry_count, **token_fields)
+                return fallback, FocusedGroupResult(
+                    group=name, success=False, retry_count=retry_count,
+                    latency_seconds=time.perf_counter() - started,
+                    error="Prompt exceeds configured context; enter and confirm facts manually.",
+                    error_code="prompt_context_over_limit",
+                )
             try:
                 candidate = self._provider.invoke_structured(prompt, schema)
                 payload = schema.model_validate(candidate)
+                self._record_prompt(MonitoringEventType.LLM_PROMPT_COMPLETED, name, status="success", provider_status="success", latency_ms=(time.perf_counter() - started) * 1000, retry_count=retry_count, **token_fields)
                 return payload, FocusedGroupResult(
                     group=name,
                     success=True,
@@ -177,6 +202,7 @@ class FocusedClaimExtractor:
                     f"Focused extraction is unavailable: {type(exc).__name__}",
                     "extraction_unavailable",
                 )
+            self._record_prompt(MonitoringEventType.LLM_PROMPT_FAILED, name, status="failed", provider_status="failed", provider_error_category=code.upper(), latency_ms=(time.perf_counter() - started) * 1000, retry_count=retry_count, **token_fields)
             return fallback, FocusedGroupResult(
                 group=name,
                 success=False,
@@ -184,6 +210,16 @@ class FocusedClaimExtractor:
                 latency_seconds=time.perf_counter() - started,
                 error=error,
                 error_code=code,
+            )
+
+    def _record_prompt(self, event_type: MonitoringEventType, name: str, **fields: Any) -> None:
+        if self._monitoring and self._request_id:
+            self._monitoring.record(
+                event_type, self._request_id,
+                prompt_name=f"focused-{name.replace('_', '-')}",
+                model_provider=getattr(self._provider, "provider_name", None),
+                model_name=getattr(self._provider, "model_name", None),
+                stage="prompt_preflight", **fields,
             )
 
     @staticmethod
